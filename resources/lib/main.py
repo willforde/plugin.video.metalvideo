@@ -1,5 +1,5 @@
 """
-	Copyright: (c) 2013 William Forde (willforde@gmail.com)
+	Copyright: (c) 2013 William Forde (willforde+xbmc@gmail.com)
 	License: GPLv3, see LICENSE for more details
 	
 	This program is free software: you can redistribute it and/or modify
