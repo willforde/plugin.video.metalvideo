@@ -99,7 +99,7 @@ class TopVideos(listitem.VirtualFS):
 			item = localListitem()
 			item.setLabel("%s. %s - %s" % (count, artist, track))
 			item.setThumbnailImage(img)
-			item.setInfoDict(artist=artist, count=intCmd(views.replace(",","")))
+			item.setInfoDict(artist=[artist], count=intCmd(views.replace(",","")))
 			item.setParamDict(action="PlayVideo", url=url)
 			
 			# Add Context item to link to related videos
@@ -143,7 +143,7 @@ class NewVideos(listitem.VirtualFS):
 			item = localListitem()
 			item.setLabel("%s - %s" % (artist, track))
 			item.setThumbnailImage(img)
-			item.setInfoDict(artist=artist)
+			item.setInfoDict(artist=[artist])
 			item.setParamDict(action="PlayVideo", url=url)
 			
 			# Add Context item to link to related videos
@@ -242,7 +242,7 @@ class VideoList(listitem.VirtualFS):
 			# Create listitem of Data
 			item = localListitem()
 			item.setLabel("%s - %s" % (artist, searchSong.findall(htmlSegment)[0]))
-			item.setInfoDict(artist=artist)
+			item.setInfoDict(artist=[artist])
 			item.setParamDict(action="PlayVideo", url=url)
 			
 			# Set Thumbnail Image
