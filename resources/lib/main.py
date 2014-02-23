@@ -265,10 +265,10 @@ class PlayVideo(listitem.PlayMedia):
 		else: TTL=604800 # TTL = 1 Week
 		
 		# Fetch Page Source
-		sourceCode = urlhandler.urlread(plugin["url"], TTL) # TTL = 8 Hours
+		sourceCode = urlhandler.urlread(plugin["url"], TTL)
 		from xbmcutil import videoResolver
 		
 		# Look for Youtube Video First
 		videoId = [part for part in re.findall('src="(http://www.youtube.com/embed/\S+?)"|file:\s+\'(\S+?)\'', sourceCode)[0] if part][0]
-		if u"www.metalvideo.com" in videoId: return {"url":videoId}
-		else: return videoResolver.youtube_com().decode(videoId)
+		if u"metalvideo.com" in videoId: return {"url":videoId}
+		elif u"youtube.com" in videoId: return videoResolver.youtube_com().decode(videoId)
