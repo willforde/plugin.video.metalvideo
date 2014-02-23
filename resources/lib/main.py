@@ -43,7 +43,7 @@ class Initialize(listitem.VirtualFS):
 		self.add_item(label=u"-Random Video", url={"action":"PlayVideo", "url":u"http://www.metalvideo.com/randomizer.php"}, isPlayable=True)
 		self.add_item(label=u"-Top 50 Videos", url={"action":"TopVideos", "url":u"http://www.metalvideo.com/topvideos.html"}, isPlayable=False)
 		self.add_item(label=u"-Latest Videos", url={"action":"NewVideos", "url":u"http://www.metalvideo.com/newvideos.html"}, isPlayable=False)
-		self.add_item(label=u"-Search", url={"action":"VideoList"}, isPlayable=False)
+		self.add_search("VideoList", "http://www.metalvideo.com/search.php?keywords=%s")
 		
 		# Loop and display each Video
 		for url, title, count in re.findall('<li class=""><a href="http://metalvideo.com/mobile/(\S+?)date.html">(.+?)</a>\s+<span class="category_count">(\d+)</span></li>', sourceCode):
@@ -202,12 +202,13 @@ class Related(listitem.VirtualFS):
 class VideoList(listitem.VirtualFS):
 	@plugin.error_handler
 	def scraper(self):
-		# Fetch SourceCode
-		if "url" in plugin:
-			# Fetch Sort Method and Crerate New Url
+		# Fetch Sort Method and Crerate New Url
+		if u"search.php" in plugin["url"]: url = plugin["url"]
+		else:
 			urlString = {u"0":u"%sdate.html", u"1":u"%sartist.html", u"2":u"%srating.html", u"3":u"%sviews.html"}[plugin.getSetting("sort")]
 			url = urlString % plugin["url"]
-		else: url = urlhandler.search(u"http://www.metalvideo.com/search.php?keywords=%s"); self.cacheToDisc= True
+		
+		# Fetch SourceCode
 		sourceCode = urlhandler.urlread(url, 28800) # TTL = 8 Hours
 		
 		# Set Content Properties
