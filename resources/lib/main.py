@@ -160,16 +160,16 @@ class Related(listitem.VirtualFS):
 	def scraper(self):
 		# Fetch SourceCode
 		url = u"http://metalvideo.com/relatedclips.php?vid=%(url)s" % plugin
-		sourceCode = urlhandler.urlread(url, 28800) # TTL = 8 Hours
+		sourceObj = urlhandler.urlopen(url, 28800) # TTL = 8 Hours
 		
 		# Set Content Properties
 		self.set_sort_methods(self.sort_method_unsorted)
 		self.set_content("episodes")
 		
 		# Fetch and Return VideoItems
-		return self.xml_scraper(sourceCode)
+		return self.xml_scraper(sourceObj)
 	
-	def xml_scraper(self, sourceCode):
+	def xml_scraper(self, sourceObj):
 		# Create Speed vars
 		results = []
 		additem = results.append
@@ -177,9 +177,10 @@ class Related(listitem.VirtualFS):
 		
 		# Import XML Parser and Parse sourceObj
 		import xml.etree.ElementTree as ElementTree
-		tree = ElementTree.fromstring(sourceCode.replace(u"&",u"&amp;"))
+		tree = ElementTree.fromstring(sourceObj.read().replace("&","&amp;"))
+		sourceObj.close()
 		
-		# Loop thought earch Show element
+		# Loop through each Show element
 		for node in tree.getiterator(u"video"):
 			# Create listitem of Data
 			item = localListitem()
