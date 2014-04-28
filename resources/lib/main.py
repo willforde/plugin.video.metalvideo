@@ -290,6 +290,8 @@ class PlayVideo(listitem.PlayMedia):
 		from xbmcutil import videoResolver
 		
 		# Look for Youtube Video First
-		videoId = [part for part in re.findall('src="(http://www.youtube.com/embed/\S+?)"|file:\s+\'(\S+?)\'', sourceCode)[0] if part][0]
-		if u"metalvideo.com" in videoId: return {"url":videoId}
-		elif u"youtube.com" in videoId: return videoResolver.youtube_com().decode(videoId)
+		try: videoId = [part for part in re.findall('src="(http://www.youtube.com/embed/\S+?)"|file:\s+\'(\S+?)\'', sourceCode)[0] if part][0]
+		except: return None
+		else:
+			if u"metalvideo.com" in videoId: return {"url":videoId}
+			elif u"youtube.com" in videoId: return videoResolver.youtube_com().decode(videoId)
