@@ -262,10 +262,29 @@ class VideoList(listitem.VirtualFS):
 class PlayVideo(listitem.PlayMedia):
 	@plugin.error_handler
 	def resolve(self):
-		# Set TTL
-		if plugin["url"].endswith(u"randomizer.php"): TTL=0
-		else: TTL=604800 # TTL = 1 Week
+		# When in party mode continuously play random video
+		if "partymode" in plugin:
+			# Add Current path to playlist
+			playlist = plugin.xbmc.PlayList(1)
+			playlist.add(plugin.handleThree)
+			# Return video url untouched
+			return self.find_video(0) # TTL = 1 Week
 		
+		# When randomizer is selected start partymode
+		elif plugin["url"].endswith(u"randomizer.php"):
+			# Clear Playlist first
+			playlist = plugin.xbmc.PlayList(1)
+			playlist.clear()
+			
+			# Return Video Player url Twice to start party mode playlist
+			return {"url":[plugin.handleThree+"partymode=true"]*2}
+		
+		# Play Selected Video
+		else:
+			# Return video url untouched
+			return self.find_video(604800) # TTL = 1 Week
+	
+	def find_video(self, TTL):
 		# Fetch Page Source
 		sourceCode = urlhandler.urlread(plugin["url"], TTL)
 		from xbmcutil import videoResolver
