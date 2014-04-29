@@ -275,9 +275,8 @@ class PlayVideo(listitem.PlayMedia):
 			# Clear Playlist first
 			playlist = plugin.xbmc.PlayList(1)
 			playlist.clear()
-			
 			# Return Video Player url Twice to start party mode playlist
-			return {"url":[plugin.handleThree+"partymode=true"]*2}
+			return {"url":[self.find_video(0), plugin.handleThree+"partymode=true"]}
 		
 		# Play Selected Video
 		else:
