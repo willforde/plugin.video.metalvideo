@@ -16,16 +16,16 @@ msgstr ""
 "Language: en\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-# Settings Codes
-msgctxt "#30100"
+# Settings Codes: 30001 to 30099
+msgctxt "#30001"
 msgid "Sort By"
 msgstr ""
 
-msgctxt "#30104"
+msgctxt "#30002"
 msgid "Views"
 msgstr ""
 
-# Addon Codes
-msgctxt "#30600"
+# Addon Codes: 30101 to 30199
+msgctxt "#30101"
 msgid "Please Select Top 50"
 msgstr ""

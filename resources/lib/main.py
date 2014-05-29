@@ -82,7 +82,7 @@ class TopVideos(listitem.VirtualFS):
 		titleList = [part[1] for part in topLists]
 		
 		# Display list for Selection
-		ret = plugin.dialogSelect(plugin.getuni(30600), titleList)
+		ret = plugin.dialogSelect(plugin.getuni(30101), titleList)
 		if ret >= 0: return topLists[ret][0]
 		else: raise plugin.ScraperError(0, "User Has Quit the Top Display")
 	
