@@ -1,4 +1,6 @@
-TODO: Create Unit Tests, Once I figure out how
+[B]Version 1.0.3[/B]
+- Updated Strings
+- Code cleanup
 
 [B]Version 1.0.3[/B]
 - Changed the Video Context menu to not replace items
