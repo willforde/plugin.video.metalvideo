@@ -29,3 +29,11 @@ msgstr ""
 msgctxt "#30101"
 msgid "Please Select Top 50"
 msgstr ""
+
+msgctxt "#30102"
+msgid "Top 50 Videos"
+msgstr ""
+
+msgctxt "#30103"
+msgid "Random Video"
+msgstr ""

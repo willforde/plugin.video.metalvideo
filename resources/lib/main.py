@@ -40,9 +40,9 @@ class Initialize(listitem.VirtualFS):
 		localListitem = listitem.ListItem
 		
 		# Add Extra Items
-		self.add_item(label=u"-Random Video", url={"action":"PlayVideo", "url":u"http://www.metalvideo.com/randomizer.php"}, isPlayable=True)
-		self.add_item(label=u"-Top 50 Videos", url={"action":"TopVideos", "url":u"http://www.metalvideo.com/topvideos.html"}, isPlayable=False)
-		self.add_item(label=u"-Latest Videos", url={"action":"NewVideos", "url":u"http://www.metalvideo.com/newvideos.html"}, isPlayable=False)
+		self.add_item(label=u"-%s" % plugin.getuni(30103), url={"action":"PlayVideo", "url":u"http://www.metalvideo.com/randomizer.php"}, isPlayable=True)
+		self.add_item(label=u"-%s" % plugin.getuni(30102), url={"action":"TopVideos", "url":u"http://www.metalvideo.com/topvideos.html"}, isPlayable=False)
+		self.add_item(label=u"-%s" % plugin.getuni(32941), url={"action":"NewVideos", "url":u"http://www.metalvideo.com/newvideos.html"}, isPlayable=False)
 		self.add_search("VideoList", "http://www.metalvideo.com/search.php?keywords=%s")
 		
 		# Loop and display each Video
@@ -53,7 +53,7 @@ class Initialize(listitem.VirtualFS):
 			item.setParamDict(action="VideoList", url=u"http://metalvideo.com/%s" % url)
 			
 			# Store Listitem data
-			additem(item.getListitemTuple(isPlayable=False))
+			additem(item.getListitemTuple(False))
 			
 		# Return list of listitems
 		return results
@@ -62,7 +62,7 @@ class TopVideos(listitem.VirtualFS):
 	@plugin.error_handler
 	def scraper(self):
 		# Fetch SourceCode
-		sourceCode = urlhandler.urlread(self.regex_selector(), 28800) # TTL = 8 Hours
+		sourceCode = urlhandler.urlread(self.regex_selector(), 14400) # TTL = 4 Hours
 		self.cacheToDisc= True
 		
 		# Set Content Properties
@@ -75,7 +75,7 @@ class TopVideos(listitem.VirtualFS):
 	def regex_selector(self):
 		# Fetch SourceCode
 		url = u"http://metalvideo.com/topvideos.html"
-		sourceCode = urlhandler.urlread(url, 2678400) # TTL = 1 Month
+		sourceCode = urlhandler.urlread(url, 604800) # TTL = 1 Week
 		
 		# Fetch list of Top Video Category
 		topLists = [part for part in re.findall('<option value="(\S+?)"\s*>\s*(.+?)\s*</option>', sourceCode) if not u"Select one" in part[1]]
@@ -106,7 +106,7 @@ class TopVideos(listitem.VirtualFS):
 			item.addRelatedContext(url=url[url.rfind(u"_")+1:url.rfind(u".")])
 			
 			# Store Listitem data
-			additem(item.getListitemTuple(isPlayable=True))
+			additem(item.getListitemTuple(True))
 		
 		# Return list of listitems
 		return results
@@ -115,7 +115,7 @@ class NewVideos(listitem.VirtualFS):
 	@plugin.error_handler
 	def scraper(self):
 		# Fetch SourceCode
-		sourceCode = urlhandler.urlread(plugin["url"], 28800) # TTL = 8 Hours
+		sourceCode = urlhandler.urlread(plugin["url"], 14400) # TTL = 4 Hours
 		
 		# Set Content Properties
 		self.set_sort_methods(self.sort_method_unsorted)
@@ -150,7 +150,7 @@ class NewVideos(listitem.VirtualFS):
 			item.addRelatedContext(url=url[url.rfind(u"_")+1:url.rfind(u".")])
 			
 			# Store Listitem data
-			additem(item.getListitemTuple(isPlayable=True))
+			additem(item.getListitemTuple(True))
 		
 		# Return list of listitems
 		return results
@@ -160,7 +160,7 @@ class Related(listitem.VirtualFS):
 	def scraper(self):
 		# Fetch SourceCode
 		url = u"http://metalvideo.com/relatedclips.php?vid=%(url)s" % plugin
-		sourceObj = urlhandler.urlopen(url, 28800) # TTL = 8 Hours
+		sourceObj = urlhandler.urlopen(url, 14400) # TTL = 4 Hours
 		
 		# Set Content Properties
 		self.set_sort_methods(self.sort_method_unsorted)
@@ -195,7 +195,7 @@ class Related(listitem.VirtualFS):
 			item.addRelatedContext(url=url[url.rfind(u"_")+1:url.rfind(u".")], updatelisting="true")
 			
 			# Store Listitem data
-			additem(item.getListitemTuple(isPlayable=True))
+			additem(item.getListitemTuple(True))
 		
 		# Return list of listitems
 		return results
@@ -210,7 +210,7 @@ class VideoList(listitem.VirtualFS):
 			url = urlString % plugin["url"]
 		
 		# Fetch SourceCode
-		sourceCode = urlhandler.urlread(url, 28800) # TTL = 8 Hours
+		sourceCode = urlhandler.urlread(url, 14400) # TTL = 4 Hours
 		
 		# Set Content Properties
 		self.set_sort_methods(self.sort_method_unsorted)
@@ -254,7 +254,7 @@ class VideoList(listitem.VirtualFS):
 			item.addRelatedContext(url=url[url.rfind(u"_")+1:url.rfind(u".")])
 			
 			# Store Listitem data
-			additem(item.getListitemTuple(isPlayable=True))
+			additem(item.getListitemTuple(True))
 			
 		# Return list of listitems
 		return results
@@ -281,7 +281,7 @@ class PlayVideo(listitem.PlayMedia):
 		# Play Selected Video
 		else:
 			# Return video url untouched
-			return self.find_video(604800) # TTL = 1 Week
+			return self.find_video(57600) # TTL = 16 Hours
 	
 	def find_video(self, TTL):
 		# Fetch Page Source
