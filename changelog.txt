@@ -1,6 +1,7 @@
-[B]Version 1.0.3[/B]
-- Updated Strings
-- Code cleanup
+[B]Version 1.0.4[/B] 2014-06-30
+- Update Strings to strings.po
+- Added UnitTests
+- And a lot more small improvements
 
 [B]Version 1.0.3[/B]
 - Changed the Video Context menu to not replace items
