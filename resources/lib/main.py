@@ -285,7 +285,7 @@ class PlayVideo(listitem.PlayMedia):
 	
 	def find_video(self, TTL):
 		# Fetch Page Source
-		sourceCode = urlhandler.urlread(plugin["url"], TTL)
+		sourceCode = urlhandler.urlread(plugin["url"], TTL, stripEntity=False)
 		from xbmcutil import videoResolver
 		
 		# Look for Youtube Video First
