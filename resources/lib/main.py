@@ -28,7 +28,6 @@ class Initialize(listitem.VirtualFS):
 		
 		# Set Content Properties
 		self.set_sort_methods(self.sort_method_title)
-		self.set_content("files")
 		
 		# Fetch and Return VideoItems
 		return self.regex_scraper(sourceCode)
@@ -67,7 +66,6 @@ class TopVideos(listitem.VirtualFS):
 		
 		# Set Content Properties
 		self.set_sort_methods(self.sort_method_program_count)
-		self.set_content("episodes")
 		
 		# Fetch and Return VideoItems
 		return self.regex_scraper(sourceCode)
@@ -119,7 +117,6 @@ class NewVideos(listitem.VirtualFS):
 		
 		# Set Content Properties
 		self.set_sort_methods(self.sort_method_unsorted)
-		self.set_content("episodes")
 		
 		# Fetch and Return VideoItems
 		return self.regex_scraper(sourceCode)
@@ -164,7 +161,6 @@ class Related(listitem.VirtualFS):
 		
 		# Set Content Properties
 		self.set_sort_methods(self.sort_method_unsorted)
-		self.set_content("episodes")
 		
 		# Fetch and Return VideoItems
 		return self.xml_scraper(sourceObj)
@@ -214,7 +210,6 @@ class VideoList(listitem.VirtualFS):
 		
 		# Set Content Properties
 		self.set_sort_methods(self.sort_method_unsorted)
-		self.set_content("episodes")
 		
 		# Fetch and Return VideoItems
 		return self.regex_scraper(sourceCode)
