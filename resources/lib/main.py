@@ -33,11 +33,6 @@ class Initialize(listitem.VirtualFS):
 		return self.regex_scraper(sourceCode)
 	
 	def regex_scraper(self, sourceCode):
-		# Create Speed vars
-		results = []
-		additem = results.append
-		localListitem = listitem.ListItem
-		
 		# Add Extra Items
 		self.add_item(label=u"-%s" % plugin.getuni(30103), url={"action":"PlayVideo", "url":u"http://www.metalvideo.com/randomizer.php"}, isPlayable=True)
 		self.add_item(label=u"-%s" % plugin.getuni(30102), url={"action":"TopVideos", "url":u"http://www.metalvideo.com/topvideos.html"}, isPlayable=False)
@@ -45,6 +40,7 @@ class Initialize(listitem.VirtualFS):
 		self.add_search("VideoList", "http://www.metalvideo.com/search.php?keywords=%s")
 		
 		# Loop and display each Video
+		localListitem = listitem.ListItem
 		for url, title, count in re.findall('<li class=""><a href="http://metalvideo.com/mobile/(\S+?)date.html">(.+?)</a>\s+<span class="category_count">(\d+)</span></li>', sourceCode):
 			# Create listitem of Data
 			item = localListitem()
@@ -52,10 +48,7 @@ class Initialize(listitem.VirtualFS):
 			item.setParamDict(action="VideoList", url=u"http://metalvideo.com/%s" % url)
 			
 			# Store Listitem data
-			additem(item.getListitemTuple(False))
-			
-		# Return list of listitems
-		return results
+			yield item.getListitemTuple(False)
 
 class TopVideos(listitem.VirtualFS):
 	@plugin.error_handler
@@ -86,9 +79,7 @@ class TopVideos(listitem.VirtualFS):
 	
 	def regex_scraper(self, sourceCode):
 		# Create Speed vars
-		results = []
 		intCmd = int
-		additem = results.append
 		localListitem = listitem.ListItem
 		
 		# Iterate the list of videos
@@ -104,10 +95,7 @@ class TopVideos(listitem.VirtualFS):
 			item.addRelatedContext(url=url[url.rfind(u"_")+1:url.rfind(u".")])
 			
 			# Store Listitem data
-			additem(item.getListitemTuple(True))
-		
-		# Return list of listitems
-		return results
+			yield item.getListitemTuple(True)
 
 class NewVideos(listitem.VirtualFS):
 	@plugin.error_handler
@@ -122,16 +110,12 @@ class NewVideos(listitem.VirtualFS):
 		return self.regex_scraper(sourceCode)
 	
 	def regex_scraper(self, sourceCode):
-		# Create Speed vars
-		results = []
-		additem = results.append
-		localListitem = listitem.ListItem
-		
 		# Add Next Page if Exists   
 		nextUrl = re.findall('<a href="(\S+?)">next \xc2\xbb</a>', sourceCode)
 		if nextUrl: self.add_next_page(url={"url":u"http://www.metalvideo.com/%s" % nextUrl[0]})
 		
 		# Iterate the list of videos
+		localListitem = listitem.ListItem
 		for url, img, artist, track in re.findall('<tr><td align="center" class="\w+" width="\d+"><a href="(\S+?)"><img src="(\S+?)" alt=".+?"  class="tinythumb" width="\d+" height="\d+" align="left" border="1" /></a></td><td class="\w+" width="\w+">(.+?)<td class="\w+"><a href="\S+?">(.+?)</a></td><td class="\w+">.+?</td></tr>', sourceCode):
 			# Create listitem of Data
 			item = localListitem()
@@ -147,10 +131,7 @@ class NewVideos(listitem.VirtualFS):
 			item.addRelatedContext(url=url[url.rfind(u"_")+1:url.rfind(u".")])
 			
 			# Store Listitem data
-			additem(item.getListitemTuple(True))
-		
-		# Return list of listitems
-		return results
+			yield item.getListitemTuple(True)
 
 class Related(listitem.VirtualFS):
 	@plugin.error_handler
@@ -166,17 +147,13 @@ class Related(listitem.VirtualFS):
 		return self.xml_scraper(sourceObj)
 	
 	def xml_scraper(self, sourceObj):
-		# Create Speed vars
-		results = []
-		additem = results.append
-		localListitem = listitem.ListItem
-		
 		# Import XML Parser and Parse sourceObj
 		import xml.etree.ElementTree as ElementTree
 		tree = ElementTree.fromstring(sourceObj.read().replace("&","&amp;"))
 		sourceObj.close()
 		
 		# Loop through each Show element
+		localListitem = listitem.ListItem
 		for node in tree.getiterator(u"video"):
 			# Create listitem of Data
 			item = localListitem()
@@ -191,10 +168,7 @@ class Related(listitem.VirtualFS):
 			item.addRelatedContext(url=url[url.rfind(u"_")+1:url.rfind(u".")], updatelisting="true")
 			
 			# Store Listitem data
-			additem(item.getListitemTuple(True))
-		
-		# Return list of listitems
-		return results
+			yield item.getListitemTuple(True)
 
 class VideoList(listitem.VirtualFS):
 	@plugin.error_handler
@@ -216,8 +190,6 @@ class VideoList(listitem.VirtualFS):
 	
 	def regex_scraper(self, sourceCode):
 		# Create Speed vars
-		results = []
-		additem = results.append
 		localListitem = listitem.ListItem
 		import CommonFunctions
 		
@@ -249,10 +221,7 @@ class VideoList(listitem.VirtualFS):
 			item.addRelatedContext(url=url[url.rfind(u"_")+1:url.rfind(u".")])
 			
 			# Store Listitem data
-			additem(item.getListitemTuple(True))
-			
-		# Return list of listitems
-		return results
+			yield item.getListitemTuple(True)
 
 class PlayVideo(listitem.PlayMedia):
 	@plugin.error_handler
