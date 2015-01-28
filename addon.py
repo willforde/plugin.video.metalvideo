@@ -26,6 +26,4 @@ def execute():
 
 # Initiate Startup
 import xbmcutil
-if __name__ == "__main__":
-	try: execute()
-	finally: xbmcutil.cleanup()
+if __name__ == "__main__": execute()
