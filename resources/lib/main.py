@@ -26,9 +26,6 @@ class Initialize(listitem.VirtualFS):
 		url = u"http://metalvideo.com/mobile/category.html"
 		sourceCode = urlhandler.urlread(url, 604800, headers={"Cookie":"COOKIE_DEVICE=mobile"}, userAgent=2) # TTL = 1 Week
 		
-		# Set Content Properties
-		self.set_sort_methods(self.sort_method_title)
-		
 		# Fetch and Return VideoItems
 		return self.regex_scraper(sourceCode)
 	
