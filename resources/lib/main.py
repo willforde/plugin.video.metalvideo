@@ -31,10 +31,11 @@ class Initialize(listitem.VirtualFS):
 	
 	def regex_scraper(self, sourceCode):
 		# Add Extra Items
-		thumb = (plugin.getIcon(),0)
-		self.add_item(label=u"-%s" % plugin.getuni(30103), thumbnail=thumb, url={"action":"PlayVideo", "url":u"http://www.metalvideo.com/randomizer.php"}, isPlayable=True)
-		self.add_item(label=u"-%s" % plugin.getuni(30102), thumbnail=thumb, url={"action":"TopVideos", "url":u"http://www.metalvideo.com/topvideos.html"}, isPlayable=False)
-		self.add_item(label=u"-%s" % plugin.getuni(32941), thumbnail=("recent.png",2), url={"action":"NewVideos", "url":u"http://www.metalvideo.com/newvideos.html"}, isPlayable=False)
+		_plugin = plugin
+		thumb = (_plugin.getIcon(),0)
+		self.add_item(label=u"-%s" % _plugin.getuni(30103), thumbnail=thumb, url={"action":"PlayVideo", "url":u"http://www.metalvideo.com/randomizer.php"}, isPlayable=True)
+		self.add_item(label=u"-%s" % _plugin.getuni(30102), thumbnail=thumb, url={"action":"TopVideos", "url":u"http://www.metalvideo.com/topvideos.html"}, isPlayable=False)
+		self.add_item(label=u"-%s" % _plugin.getuni(32941), thumbnail=("recent.png",2), url={"action":"NewVideos", "url":u"http://www.metalvideo.com/newvideos.html"}, isPlayable=False)
 		self.add_search("VideoList", "http://www.metalvideo.com/search.php?keywords=%s")
 		
 		# Loop and display each Video
@@ -62,6 +63,7 @@ class TopVideos(listitem.VirtualFS):
 		return self.regex_scraper(sourceCode)
 	
 	def regex_selector(self):
+		_plugin = plugin
 		# Fetch SourceCode
 		url = u"http://metalvideo.com/topvideos.html"
 		sourceCode = urlhandler.urlread(url, 604800) # TTL = 1 Week
@@ -71,9 +73,9 @@ class TopVideos(listitem.VirtualFS):
 		titleList = [part[1] for part in topLists]
 		
 		# Display list for Selection
-		ret = plugin.dialogSelect(plugin.getuni(30101), titleList)
+		ret = _plugin.dialogSelect(_plugin.getuni(30101), titleList)
 		if ret >= 0: return topLists[ret][0]
-		else: raise plugin.ScraperError(0, "User Has Quit the Top Display")
+		else: raise _plugin.ScraperError(0, "User Has Quit the Top Display")
 	
 	def regex_scraper(self, sourceCode):
 		# Create Speed vars
@@ -171,11 +173,12 @@ class Related(listitem.VirtualFS):
 class VideoList(listitem.VirtualFS):
 	@plugin.error_handler
 	def scraper(self):
+		_plugin = plugin
 		# Fetch Sort Method and Crerate New Url
-		if u"search.php" in plugin["url"]: url = plugin["url"]
+		if u"search.php" in _plugin["url"]: url = _plugin["url"]
 		else:
-			urlString = {u"0":u"%sdate.html", u"1":u"%sartist.html", u"2":u"%srating.html", u"3":u"%sviews.html"}[plugin.getSetting("sort")]
-			url = urlString % plugin["url"]
+			urlString = {u"0":u"%sdate.html", u"1":u"%sartist.html", u"2":u"%srating.html", u"3":u"%sviews.html"}[_plugin.getSetting("sort")]
+			url = urlString % _plugin["url"]
 		
 		# Fetch SourceCode
 		sourceCode = urlhandler.urlread(url, 14400) # TTL = 4 Hours
@@ -221,24 +224,25 @@ class VideoList(listitem.VirtualFS):
 			# Store Listitem data
 			yield item.getListitemTuple(True)
 
-class PlayVideo(listitem.PlayMedia):
+class PlayVideo(listitem.PlaySource):
 	@plugin.error_handler
 	def resolve(self):
+		_plugin = plugin
 		# When in party mode continuously play random video
-		if "partymode" in plugin:
+		if "partymode" in _plugin:
 			# Add Current path to playlist
-			playlist = plugin.xbmc.PlayList(1)
-			playlist.add(plugin.handleThree)
+			playlist = _plugin.xbmc.PlayList(1)
+			playlist.add(_plugin.handleThree)
 			# Return video url untouched
 			return self.find_video(0) # TTL = 1 Week
 		
 		# When randomizer is selected start partymode
-		elif plugin["url"].endswith(u"randomizer.php"):
+		elif _plugin["url"].endswith(u"randomizer.php"):
 			# Clear Playlist first
-			playlist = plugin.xbmc.PlayList(1)
+			playlist = _plugin.xbmc.PlayList(1)
 			playlist.clear()
 			# Return Video Player url Twice to start party mode playlist
-			return {"url":[self.find_video(0), plugin.handleThree+"partymode=true"]}
+			return {"url":[self.find_video(0), _plugin.handleThree+"partymode=true"]}
 		
 		# Play Selected Video
 		else:
@@ -255,5 +259,5 @@ class PlayVideo(listitem.PlayMedia):
 		except: return None
 		else:
 			print 
-			if u"metalvideo.com" in videoId: return {"url":videoId}
-			elif u"youtube.com" in videoId: return self.sources(videoId, sourcetype="youtube_com")
+			if u"metalvideo.com" in videoId: return videoId
+			elif u"youtube.com" in videoId: return self.sourceType(videoId, "youtube_com")
