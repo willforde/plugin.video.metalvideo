@@ -1,5 +1,6 @@
 [B]Version 1.0.5[/B] 2015-01-19
 - Removed set_content call
+- Removed download support
 - Removed unneeded set_sort_methods
 - Removed xbmcutil.cleanup try finally catch
 - Change to return a generator instead of a list
