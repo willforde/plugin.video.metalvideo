@@ -17,6 +17,7 @@
 """
 
 def execute():
+	import xbmcutil
 	action = xbmcutil.plugin.actions[0]
 	if action == u"system": xbmcutil.sysCheck()
 	else:
@@ -25,5 +26,4 @@ def execute():
 		getattr(plugin, action)()
 
 # Initiate Startup
-import xbmcutil
 if __name__ == "__main__": execute()
