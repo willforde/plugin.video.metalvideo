@@ -5,7 +5,7 @@
 		<setting id="sort" type="enum" label="30001" lvalues="552|557|563|30002" default="0" />
 		<!-- ViewModes -->
 		<setting type="sep" />
-		<setting label="$ADDON[script.module.xbmcutil 32921]" type="action" action="RunScript(plugin.video.metalvideo, setViewMode, folder)"/>
-		<setting label="$ADDON[script.module.xbmcutil 32922]" type="action" action="RunScript(plugin.video.metalvideo, setViewMode, video)"/>
+		<setting label="$ADDON[script.module.xbmcutil 33921]" type="action" action="RunScript(plugin.video.metalvideo, setViewMode, folder)"/>
+		<setting label="$ADDON[script.module.xbmcutil 33922]" type="action" action="RunScript(plugin.video.metalvideo, setViewMode, video)"/>
 	</category>
 </settings>
