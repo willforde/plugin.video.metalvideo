@@ -252,7 +252,6 @@ class PlayVideo(listitem.PlaySource):
 	def find_video(self, TTL=57600):
 		# Fetch Page Source
 		sourceCode = urlhandler.urlread(plugin["url"], TTL, stripEntity=False)
-		from xbmcutil import videoResolver
 		
 		# Look for Youtube Video First
 		try: videoId = [part for part in re.findall('src="(http://www.youtube.com/embed/\S+?)"|file:\s+\'(\S+?)\'', sourceCode)[0] if part][0]
