@@ -51,24 +51,24 @@ class WatchingParser(HTMLParser.HTMLParser):
 	def handle_starttag(self, tag, attrs):
 		# If not attrs exist then i dont need to proceed
 		if not attrs: return
-		elif tag == "div":
+		elif tag == u"div":
 			# Convert Attributes to a Dictionary
 			for key, value in attrs:
-				if key == "id" and value == "playingnow":
+				if key == u"id" and value == u"playingnow":
 					self.section = 1
 					break
 		
 		# Search for internel block
-		elif self.section == 1 and tag == "li":
+		elif self.section == 1 and tag == u"li":
 			self.section = 2
 			self.reset_lists()
 		
 		# Search for video content when within video block
 		elif self.section == 2:
 			# Search for url
-			if tag == "a" and not "url" in self.item.urlParams:
+			if tag == u"a" and not u"url" in self.item.urlParams:
 				for key, value in attrs:
-					if key == "href":
+					if key == u"href":
 						# Set video url
 						self.item.urlParams["url"] = value
 						
@@ -76,23 +76,23 @@ class WatchingParser(HTMLParser.HTMLParser):
 						self.item.addRelatedContext(url=value[value.rfind(u"_")+1:value.rfind(u".")])
 			
 			# Search for image url
-			elif tag == "img":
+			elif tag == u"img":
 				# Search for imgae and title
 				for key, value in attrs:
 					# Serch for image url
-					if key == "src":
+					if key == u"src":
 						self.item.setThumb(value)
 					
 					# Search for video title
-					elif key == "alt":
+					elif key == u"alt":
 						self.item.setLabel(value)
 	
 	def handle_endtag(self, tag):
 		# Check for the end video li tag
-		if tag == "li" and self.section == 2:
+		if tag == u"li" and self.section == 2:
 			self.append(self.item.getListitemTuple(True))
 			self.section = 1
 		
 		# Check for the full end ul tag
-		elif tag == "ul" and self.section == 1:
+		elif tag == u"ul" and self.section == 1:
 			raise plugin.ParserError
