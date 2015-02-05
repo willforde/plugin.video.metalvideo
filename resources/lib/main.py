@@ -249,7 +249,7 @@ class PlayVideo(listitem.PlaySource):
 			# Return video url untouched
 			return self.find_video(57600) # TTL = 16 Hours
 	
-	def find_video(self, TTL):
+	def find_video(self, TTL=57600):
 		# Fetch Page Source
 		sourceCode = urlhandler.urlread(plugin["url"], TTL, stripEntity=False)
 		from xbmcutil import videoResolver
