@@ -23,21 +23,23 @@ import re
 class Initialize(listitem.VirtualFS):
 	@plugin.error_handler
 	def scraper(self):
+		# Fetch html source
 		url = u"http://metalvideo.com/mobile/category.html"
 		sourceCode = urlhandler.urlread(url, 604800, headers={"Cookie":"COOKIE_DEVICE=mobile"}, userAgent=2) # TTL = 1 Week
 		
-		# Fetch and Return VideoItems
-		return self.regex_scraper(sourceCode)
-	
-	def regex_scraper(self, sourceCode):
 		# Add Extra Items
 		_plugin = plugin
 		thumb = (_plugin.getIcon(),0)
+		self.add_item(label=u"-%s" % _plugin.getuni(30104), thumbnail=thumb, url={"action":"PlayVideo", "url":u"http://metalvideo.com/index.html"}, isPlayable=True)
 		self.add_item(label=u"-%s" % _plugin.getuni(30103), thumbnail=thumb, url={"action":"PlayVideo", "url":u"http://www.metalvideo.com/randomizer.php"}, isPlayable=True)
 		self.add_item(label=u"-%s" % _plugin.getuni(30102), thumbnail=thumb, url={"action":"TopVideos", "url":u"http://www.metalvideo.com/topvideos.html"}, isPlayable=False)
 		self.add_item(label=u"-%s" % _plugin.getuni(32941), thumbnail=("recent.png",2), url={"action":"NewVideos", "url":u"http://www.metalvideo.com/newvideos.html"}, isPlayable=False)
 		self.add_search("VideoList", "http://www.metalvideo.com/search.php?keywords=%s")
 		
+		# Fetch and Return VideoItems
+		return self.regex_scraper(sourceCode)
+	
+	def regex_scraper(self, sourceCode):
 		# Loop and display each Video
 		localListitem = listitem.ListItem
 		for url, title, count in re.findall('<li class=""><a href="http://metalvideo.com/mobile/(\S+?)date.html">(.+?)</a>\s+<span class="category_count">(\d+)</span></li>', sourceCode):
