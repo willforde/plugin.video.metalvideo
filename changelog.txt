@@ -1,5 +1,6 @@
 [B]Version 1.0.5[/B] 2015-01-19
 - Added video of the day item
+- Added Videos being watched right now item
 - Removed set_content call
 - Removed download support
 - Removed unneeded set_sort_methods

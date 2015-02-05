@@ -48,3 +48,7 @@ msgstr ""
 msgctxt "#30104"
 msgid "Video of the day"
 msgstr ""
+
+msgctxt "#30105"
+msgid "Being watched right now"
+msgstr ""

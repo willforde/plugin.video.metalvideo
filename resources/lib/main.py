@@ -32,6 +32,7 @@ class Initialize(listitem.VirtualFS):
 		_add_item = self.add_item
 		thumb = (_plugin.getIcon(),0)
 		_add_item(label=u"-%s" % _plugin.getuni(30104), thumbnail=thumb, url={"action":"PlayVideo", "url":u"http://metalvideo.com/index.html"}, isPlayable=True)
+		_add_item(label=u"-%s" % _plugin.getuni(30105), thumbnail=thumb, url={"action":"Watching", "url":u"http://metalvideo.com/index.html"}, isPlayable=False)
 		_add_item(label=u"-%s" % _plugin.getuni(30103), thumbnail=thumb, url={"action":"PlayVideo", "url":u"http://metalvideo.com/randomizer.php"}, isPlayable=True)
 		_add_item(label=u"-%s" % _plugin.getuni(30102), thumbnail=thumb, url={"action":"TopVideos", "url":u"http://metalvideo.com/topvideos.html"}, isPlayable=False)
 		_add_item(label=u"-%s" % _plugin.getuni(32941), thumbnail=("recent.png",2), url={"action":"NewVideos", "url":u"http://metalvideo.com/newvideos.html"}, isPlayable=False)
@@ -52,6 +53,13 @@ class Initialize(listitem.VirtualFS):
 			# Store Listitem data
 			yield item.getListitemTuple(False)
 
+class Watching(listitem.VirtualFS):
+	@plugin.error_handler
+	def scraper(self):
+		import parsers
+		with urlhandler.urlopen(plugin["url"], 600) as sourceObj: # TTL = 10 Minutes
+			return parsers.WatchingParser().parse(sourceObj)
+
 class TopVideos(listitem.VirtualFS):
 	@plugin.error_handler
 	def scraper(self):
@@ -68,7 +76,7 @@ class TopVideos(listitem.VirtualFS):
 	def regex_selector(self):
 		_plugin = plugin
 		# Fetch SourceCode
-		url = u"http://metalvideo.com/topvideos.html"
+		url = _plugin["url"]
 		sourceCode = urlhandler.urlread(url, 604800) # TTL = 1 Week
 		
 		# Fetch list of Top Video Category
