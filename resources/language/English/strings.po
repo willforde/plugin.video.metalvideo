@@ -1,4 +1,4 @@
-# XBMC Media Center language file
+# Kodi Media Center language file
 # Addon Name: MetalVideo
 # Addon id: plugin.video.metalvideo
 # Addon Provider: willforde
