@@ -1,4 +1,4 @@
-[B]Version 1.0.5[/B] 2015-01-19
+[B]Version 2.0.0[/B] 2015-02-10
 - Added video of the day item
 - Added Videos being watched right now item
 - Removed set_content call
