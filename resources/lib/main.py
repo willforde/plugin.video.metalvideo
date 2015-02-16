@@ -31,11 +31,11 @@ class Initialize(listitem.VirtualFS):
 		_plugin = plugin
 		_add_item = self.add_item
 		thumb = (_plugin.getIcon(),0)
-		_add_item(label=u"-%s" % _plugin.getuni(30104), thumbnail=thumb, url={"action":"PlayVideo", "url":u"http://metalvideo.com/index.html"}, isPlayable=True)
-		_add_item(label=u"-%s" % _plugin.getuni(30105), thumbnail=thumb, url={"action":"Watching", "url":u"http://metalvideo.com/index.html"}, isPlayable=False)
-		_add_item(label=u"-%s" % _plugin.getuni(30103), thumbnail=thumb, url={"action":"PlayVideo", "url":u"http://metalvideo.com/randomizer.php"}, isPlayable=True)
-		_add_item(label=u"-%s" % _plugin.getuni(30102), thumbnail=thumb, url={"action":"TopVideos", "url":u"http://metalvideo.com/topvideos.html"}, isPlayable=False)
-		_add_item(label=u"-%s" % _plugin.getuni(32941), thumbnail=("recent.png",2), url={"action":"NewVideos", "url":u"http://metalvideo.com/newvideos.html"}, isPlayable=False)
+		_add_item(label=_plugin.getuni(30104), thumbnail=thumb, url={"action":"PlayVideo", "url":u"http://metalvideo.com/index.html"}, isPlayable=True)
+		_add_item(label=_plugin.getuni(30105), thumbnail=thumb, url={"action":"Watching", "url":u"http://metalvideo.com/index.html"}, isPlayable=False)
+		_add_item(label=_plugin.getuni(30103), thumbnail=thumb, url={"action":"PlayVideo", "url":u"http://metalvideo.com/randomizer.php"}, isPlayable=True)
+		_add_item(label=_plugin.getuni(30102), thumbnail=thumb, url={"action":"TopVideos", "url":u"http://metalvideo.com/topvideos.html"}, isPlayable=False)
+		_add_item(label=_plugin.getuni(32941), thumbnail=("recent.png",2), url={"action":"NewVideos", "url":u"http://metalvideo.com/newvideos.html"}, isPlayable=False)
 		self.add_search("VideoList", "http://metalvideo.com/search.php?keywords=%s")
 		
 		# Fetch and Return VideoItems
