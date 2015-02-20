@@ -30,11 +30,12 @@ class Initialize(listitem.VirtualFS):
 		# Add Extra Items
 		_plugin = plugin
 		_add_item = self.add_item
-		thumb = (_plugin.getIcon(),0)
-		_add_item(label=_plugin.getuni(30104), thumbnail=thumb, url={"action":"PlayVideo", "url":u"http://metalvideo.com/index.html"}, isPlayable=True)
-		_add_item(label=_plugin.getuni(30105), thumbnail=thumb, url={"action":"Watching", "url":u"http://metalvideo.com/index.html"}, isPlayable=False)
-		_add_item(label=_plugin.getuni(30103), thumbnail=thumb, url={"action":"PlayVideo", "url":u"http://metalvideo.com/randomizer.php"}, isPlayable=True)
-		_add_item(label=_plugin.getuni(30102), thumbnail=thumb, url={"action":"TopVideos", "url":u"http://metalvideo.com/topvideos.html"}, isPlayable=False)
+		self.icon = icon = _plugin.getIcon()
+		_thumb = (icon,0)
+		_add_item(label=_plugin.getuni(30104), thumbnail=_thumb, url={"action":"PlayVideo", "url":u"http://metalvideo.com/index.html"}, isPlayable=True)
+		_add_item(label=_plugin.getuni(30105), thumbnail=_thumb, url={"action":"Watching", "url":u"http://metalvideo.com/index.html"}, isPlayable=False)
+		_add_item(label=_plugin.getuni(30103), thumbnail=_thumb, url={"action":"PlayVideo", "url":u"http://metalvideo.com/randomizer.php"}, isPlayable=True)
+		_add_item(label=_plugin.getuni(30102), thumbnail=_thumb, url={"action":"TopVideos", "url":u"http://metalvideo.com/topvideos.html"}, isPlayable=False)
 		_add_item(label=_plugin.getuni(32941), thumbnail=("recent.png",2), url={"action":"NewVideos", "url":u"http://metalvideo.com/newvideos.html"}, isPlayable=False)
 		self.add_search("VideoList", "http://metalvideo.com/search.php?keywords=%s")
 		
@@ -43,10 +44,12 @@ class Initialize(listitem.VirtualFS):
 	
 	def regex_scraper(self, sourceCode):
 		# Loop and display each Video
+		icon = self.icon
 		localListitem = listitem.ListItem
 		for url, title, count in re.findall('<li class=""><a href="http://metalvideo.com/mobile/(\S+?)date.html">(.+?)</a>\s+<span class="category_count">(\d+)</span></li>', sourceCode):
 			# Create listitem of Data
 			item = localListitem()
+			item.setThumb(icon)
 			item.setLabel(u"%s (%s)" % (title, count))
 			item.setParamDict(action="VideoList", url=u"http://metalvideo.com/%s" % url)
 			
