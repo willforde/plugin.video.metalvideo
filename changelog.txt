@@ -1,3 +1,6 @@
+[B]Version 2.0.1[/B]
+- Added option to disable url caching from the add-on settings.
+
 [B]Version 2.0.0[/B] 2015-02-20
 - Added video of the day item
 - Added Videos being watched right now item
