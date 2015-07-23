@@ -4,7 +4,6 @@
 		<import addon="xbmc.python" version="2.19.0"/>
 		<import addon="script.module.xbmcutil" version="3.0.0"/>
 		<import addon="plugin.video.youtube" version="5.0.0"/>
-		<import addon="script.module.parsedom" version="2.5.0"/>
 	</requires>
 	<extension library="addon.py" point="xbmc.python.pluginsource">
 		<provides>audio video</provides>
