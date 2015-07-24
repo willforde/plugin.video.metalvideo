@@ -237,6 +237,5 @@ class PlayVideo(listitem.PlaySource):
 		try: videoId = [part for part in re.findall('src="(http://www.youtube.com/embed/\S+?)"|file:\s+\'(\S+?)\'', sourceCode)[0] if part][0]
 		except: return None
 		else:
-			print 
 			if u"metalvideo.com" in videoId: return videoId
 			elif u"youtube.com" in videoId: return self.sourceType(videoId, "youtube_com")
