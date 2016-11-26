@@ -38,17 +38,17 @@ msgid "Please Select Top 50"
 msgstr ""
 
 msgctxt "#30102"
-msgid "Top 50 Videos"
+msgid "[B]Top 50 Videos[/B]"
 msgstr ""
 
 msgctxt "#30103"
-msgid "Random Videos"
+msgid "[B]Party Mode[/B]"
 msgstr ""
 
 msgctxt "#30104"
-msgid "Video of the day"
+msgid "[B]Video of the day[/B]"
 msgstr ""
 
 msgctxt "#30105"
-msgid "Being watched right now"
+msgid "[B]Being watched right now[/B]"
 msgstr ""
