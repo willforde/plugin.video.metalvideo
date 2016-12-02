@@ -251,9 +251,9 @@ def play_video():
 
 
 @plugin.resolve("/partymode")
-def party_play(tools):
+def party_play():
     url = play_video()
-    return tools.create_loopback(url)
+    return party_play.create_loopback(url)
 
 
 # Initiate Startup
