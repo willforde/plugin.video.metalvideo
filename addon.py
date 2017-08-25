@@ -271,9 +271,9 @@ def party_play(plugin, url):
 
         # Increment attempts counter
         attempts += 1
-    else:
-        # All 3 attemps failed to resolve a url
-        return None
+
+    # All 3 attemps failed to resolve a url
+    return None
 
 
 # Initiate Startup
