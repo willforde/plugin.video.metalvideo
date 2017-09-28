@@ -97,3 +97,6 @@ ENV/
 
 # PyCharm
 .idea/
+
+# Addondev
+.kodi

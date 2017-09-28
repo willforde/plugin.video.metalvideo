@@ -33,7 +33,7 @@ url_constructor = utils.urljoin_partial("http://metalvideo.com")
 
 # noinspection PyUnusedLocal
 @Route.register
-def root(plugin, content_type=None):
+def root(plugin, content_type):
     """
     :param Route plugin: The plugin parent object.
     :param str content_type: The type of content been listed e.g. video, music. This is passed in from kodi and
@@ -91,7 +91,6 @@ def recent_videos(plugin, url="newvideos.php"):
     # Fetch next page url
     next_tag = root_elem.find("./div[@class='pagination']").findall("./a")[-1]
     if next_tag.text.startswith("next"):
-        print next_tag.get("href")
         yield Listitem.next_page(url=next_tag.get("href"))
 
 
