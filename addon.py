@@ -56,7 +56,7 @@ def root(plugin, content_type):
 
         # Set label with video count added
         item.label = "%s (%s)" % (a_tag.text, elem.find("span").text)
-        item.set_callback(video_list, url=a_tag.get("href"))
+        item.set_callback(video_list, cat=a_tag.get("href"))
         yield item
 
     # Add the video items here so that show at the end of the listing
