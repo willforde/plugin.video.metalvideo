@@ -91,9 +91,9 @@ def recent_videos(plugin, url="newvideos.php"):
             yield item
 
     # Fetch next page url
-    next_tag = root_elem.find("./div[@class='pagination']").findall("./a")[-1]
-    if next_tag.text.startswith("next"):
-        yield Listitem.next_page(url=next_tag.get("href"))
+    next_tag = root_elem.findall("./div[@class='pagination']/a")
+    if next_tag and next_tag[-1].text.startswith("next"):
+        yield Listitem.next_page(url=next_tag[-1].get("href"))
 
 
 @Route.register
@@ -222,9 +222,9 @@ def video_list(plugin, url=None, cat=None, search_query=None):
         yield item
 
     # Fetch next page url
-    next_tag = root_elem.find(".//div[@class='pagination']").findall("./a")[-1]
-    if next_tag.text.startswith("next"):
-        yield Listitem.next_page(url=next_tag.get("href"))
+    next_tag = root_elem.findall(".//div[@class='pagination']/a")
+    if next_tag and next_tag[-1].text.startswith("next"):
+        yield Listitem.next_page(url=next_tag[-1].get("href"))
 
 
 @Resolver.register
