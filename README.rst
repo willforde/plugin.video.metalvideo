@@ -9,7 +9,7 @@ This is a kodi video add-on for Heavy Metal Music Videos.
 
 A Place for all your heavy metal music videos, With loads of categorys.
 
-The add-on is available in the official kodi repository and is available on kodi v17 "Krypton" and greater.
+The add-on is available in the official kodi repository for kodi v17 "Krypton" and greater.
 
 .. image:: resources/screenshots/screenshot000.jpg
 .. image:: resources/screenshots/screenshot001.jpg
