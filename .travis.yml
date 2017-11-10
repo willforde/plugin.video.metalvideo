@@ -4,6 +4,13 @@ python:
   - "2.7"
   - "3.6"
 
+cache:
+  directories:
+    - $HOME/.cache/kodi_mock/addons
+
+before_cache:
+  - rm -rf $HOME/.cache/kodi_mock/addons/packages
+
 install:
   - pip install coveralls
   - pip install pytest-cov
