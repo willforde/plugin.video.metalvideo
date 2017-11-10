@@ -1,4 +1,4 @@
-from addondev import initializer
+from addondev import initializer, testing
 import os
 
 initializer(os.path.dirname(os.path.dirname(__file__)))
@@ -38,3 +38,13 @@ class Tester(unittest.TestCase):
     def test_video_list_search(self):
         data = addon.video_list.test(search_query="rock")
         self.assertGreaterEqual(len(data), 25)
+
+    def test_top_all(self):
+        testing.mock_select_dialog(0)
+        data = addon.top_videos.test()
+        self.assertGreaterEqual(len(data), 50)
+
+    def test_top_converts(self):
+        testing.mock_select_dialog(5)
+        data = addon.top_videos.test()
+        self.assertGreaterEqual(len(data), 50)
