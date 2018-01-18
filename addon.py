@@ -32,6 +32,34 @@ PARTY_MODE = 589
 # Base url constructor
 url_constructor = utils.urljoin_partial("http://metalvideo.com")
 
+# Patterens to extract video url
+# Copied from the Youtube-DL project
+# https://github.com/rg3/youtube-dl/blob/4471affc348af40409188f133786780edd969623/youtube_dl/extractor/youtube.py#L329
+VALID_URL = r"""(?x)^
+(
+ (?:https?://|//)                                     # http(s):// or protocol-independent URL
+ (?:(?:(?:(?:\w+\.)?[yY][oO][uU][tT][uU][bB][eE](?:-nocookie)?\.com/|
+    youtube\.googleapis\.com/)                        # the various hostnames, with wildcard subdomains
+ (?:.*?\#/)?                                          # handle anchor (#/) redirect urls
+ (?:                                                  # the various things that can precede the ID:
+     (?:(?:v|embed|e)/(?!videoseries))                # v/ or embed/ or e/
+     |(?:                                             # or the v= param in all its forms
+         (?:(?:watch|movie)(?:_popup)?(?:\.php)?/?)?  # preceding watch(_popup|.php) or nothing (like /?v=xxxx)
+         (?:\?|\#!?)                                  # the params delimiter ? or # or #!
+         (?:.*?[&;])??                                # any other preceding param (like /?s=tuff&v=xxxx or
+         v=                                           # ?s=tuff&amp;v=V36LpHqtcDY)
+     )
+ ))
+ |(?:
+    youtu\.be|                                        # just youtu.be/xxxx
+    vid\.plus|                                        # or vid.plus/xxxx
+    zwearz\.com/watch|                                # or zwearz.com/watch/xxxx
+ ))
+)?                                                       # all until now is optional -> you can pass the naked ID
+([0-9A-Za-z_-]{11})                                      # here is it! the YouTube video ID
+(?(1).+)?                                                # if we found the ID, everything can follow
+$"""
+
 
 # noinspection PyUnusedLocal
 @Route.register
@@ -234,18 +262,22 @@ def play_video(plugin, url):
     :param unicode url: The url of a video.
     :returns: A playable video url.
     """
-    # Attemp to find url using extract_source(YTDL) first
     url = url_constructor(url)
-    source_url = plugin.extract_source(url)
-    if source_url:
-        return source_url
+    html = plugin.request.get(url, max_age=-1)
+    video_elem = html.parse("div", attrs={"id": "Playerholder"})
+
+    # Attemp to find url using extract_source(YTDL) first
+    youtube_url = video_elem.find(".//object/param").get("value")
+    match = re.match(VALID_URL, youtube_url, re.VERBOSE)
+    if match is not None:
+        videoid = match.group(2)
+        return "plugin://plugin.video.youtube/play/?video_id={}".format(videoid)
 
     # Fallback to search for direct file
-    html = plugin.request.get(url).text
     search_regx = 'file:\s+\'(\S+?)\''
-    match = re.findall(search_regx, html)
-    if match:
-        return match[0]
+    match = re.match(search_regx, html.text)
+    if match is not None:
+        return match.group(2)
 
 
 @Resolver.register
