@@ -148,6 +148,7 @@ def watching_now(plugin):
 def top_videos(plugin):
     """:param Route plugin: The plugin parent object."""
     # Fetch HTML Source
+    plugin.cache_to_disc = True
     url = url_constructor("/topvideos.html")
     html = plugin.request.get(url)
     titles = []
@@ -183,6 +184,9 @@ def top_videos(plugin):
                 item.context.related(related, url=url)
                 item.set_callback(play_video, url=url)
                 yield item
+    else:
+        plugin.logger.debug("why")
+        yield False
 
 
 @Route.register
@@ -263,21 +267,29 @@ def play_video(plugin, url):
     :returns: A playable video url.
     """
     url = url_constructor(url)
-    html = plugin.request.get(url, max_age=-1)
+    html = plugin.request.get(url, max_age=0)
     video_elem = html.parse("div", attrs={"id": "Playerholder"})
 
     # Attemp to find url using extract_source(YTDL) first
-    youtube_url = video_elem.find(".//object/param").get("value")
-    match = re.match(VALID_URL, youtube_url, re.VERBOSE)
-    if match is not None:
-        videoid = match.group(2)
-        return "plugin://plugin.video.youtube/play/?video_id={}".format(videoid)
+    player_object = video_elem.find(".//object/param")
+    if player_object is not None:
+        match = re.match(VALID_URL, player_object.get("value"), re.VERBOSE)
+        if match is not None:
+            videoid = match.group(2)
+            return "plugin://plugin.video.youtube/play/?video_id={}".format(videoid)
 
-    # Fallback to search for direct file
+    # Attemp to search for direct file
     search_regx = 'file:\s+\'(\S+?)\''
-    match = re.match(search_regx, html.text)
+    match = re.search(search_regx, html.text)
     if match is not None:
-        return match.group(2)
+        return match.group(1)
+
+    # Attemp to search for flash file
+    search_regx = 'clips.+?url:\s*\'(http://metalvideo\.com/videos.php\?vid=\S+)\''
+    match = re.search(search_regx, html.text)
+    plugin.logger.debug(match)
+    if match is not None:
+        return match.group(1)
 
 
 @Resolver.register
