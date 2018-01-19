@@ -259,6 +259,14 @@ def video_list(plugin, url=None, cat=None, search_query=None):
         yield Listitem.next_page(url=next_tag[-1].get("href"))
 
 
+def embeded_videos(video_elem):
+    urls = []
+    urls.extend(video_elem.findall(".//iframe[@src]"))
+    urls.extend(video_elem.findall(".//embed[@src]"))
+    for url in urls:
+        yield url.get("src")
+
+
 @Resolver.register
 def play_video(plugin, url):
     """
@@ -271,9 +279,9 @@ def play_video(plugin, url):
     video_elem = html.parse("div", attrs={"id": "Playerholder"})
 
     # Attemp to find url using extract_source(YTDL) first
-    player_object = video_elem.find(".//object/param")
-    if player_object is not None:
-        match = re.match(VALID_URL, player_object.get("value"), re.VERBOSE)
+    video_urls = embeded_videos(video_elem)
+    for url in video_urls:
+        match = re.match(VALID_URL, url)
         if match is not None:
             videoid = match.group(2)
             return "plugin://plugin.video.youtube/play/?video_id={}".format(videoid)
