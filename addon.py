@@ -63,7 +63,7 @@ $"""
 
 # noinspection PyUnusedLocal
 @Route.register
-def root(plugin, content_type):
+def root(plugin, content_type="video"):
     """
     :param Route plugin: The plugin parent object.
     :param str content_type: The type of content been listed e.g. video, music. This is passed in from kodi and
