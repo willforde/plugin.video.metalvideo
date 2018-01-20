@@ -185,7 +185,6 @@ def top_videos(plugin):
                 item.set_callback(play_video, url=url)
                 yield item
     else:
-        plugin.logger.debug("why")
         yield False
 
 
@@ -276,7 +275,10 @@ def play_video(plugin, url):
     """
     url = url_constructor(url)
     html = plugin.request.get(url, max_age=0)
-    video_elem = html.parse("div", attrs={"id": "Playerholder"})
+    try:
+        video_elem = html.parse("div", attrs={"id": "Playerholder"})
+    except RuntimeError:
+        return None
 
     # Attemp to find url using extract_source(YTDL) first
     video_urls = embeded_videos(video_elem)
@@ -286,16 +288,16 @@ def play_video(plugin, url):
             videoid = match.group(2)
             return "plugin://plugin.video.youtube/play/?video_id={}".format(videoid)
 
-    # Attemp to search for direct file
-    search_regx = 'file:\s+\'(\S+?)\''
-    match = re.search(search_regx, html.text)
-    if match is not None:
-        return match.group(1)
-
     # Attemp to search for flash file
     search_regx = 'clips.+?url:\s*\'(http://metalvideo\.com/videos.php\?vid=\S+)\''
     match = re.search(search_regx, html.text)
     plugin.logger.debug(match)
+    if match is not None:
+        return match.group(1)
+
+    # Attemp to search for direct file
+    search_regx = 'file:\s+\'(\S+?)\''
+    match = re.search(search_regx, html.text)
     if match is not None:
         return match.group(1)
 
@@ -312,21 +314,18 @@ def party_play(plugin, url):
     attempts = 0
     while attempts < 3:
         try:
-            url = play_video(plugin, url)
+            video_url = play_video(plugin, url)
         except Exception as e:
             # Raise the Exception if we are on the last run of the loop
             if attempts == 2:
                 raise e
         else:
-            if url:
+            if video_url:
                 # Break from loop when we have a url
-                return plugin.create_loopback(url)
+                return plugin.create_loopback(video_url)
 
         # Increment attempts counter
         attempts += 1
-
-    # All 3 attemps failed to resolve a url
-    return None
 
 
 # Initiate Startup
