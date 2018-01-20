@@ -6,7 +6,7 @@ import os
 import addon
 
 # Check if we are in a travis-ci environment
-travis_env = 'TRAVIS' in os.environ
+travis_env = "TRAVIS" in os.environ
 
 
 class Tester(unittest.TestCase):
