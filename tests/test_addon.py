@@ -1,8 +1,12 @@
 from addondev import testing, plugin_data
 import unittest
+import os
 
 # Testing specific imports
 import addon
+
+# Check if we are in a travis-ci environment
+travis_env = 'TRAVIS' in os.environ
 
 
 class Tester(unittest.TestCase):
@@ -58,18 +62,22 @@ class Tester(unittest.TestCase):
         self.assertEqual(len(data), 1)
         self.assertFalse(data[0])
 
+    @unittest.skipIf(travis_env, "Requires version 0.9.2 of codequick in kodi repo")
     def test_video_decode_youtube_iframe(self):
         data = addon.play_video.test(url="/megadeth/holy-wars-the-punishment-due-video_4b77ac7ad.html")
         self.assertEqual(data, "plugin://plugin.video.youtube/play/?video_id=9d4ui9q7eDM")
 
+    @unittest.skipIf(travis_env, "Requires version 0.9.2 of codequick in kodi repo")
     def test_video_decode_youtube_embed(self):
         data = addon.play_video.test(url="/rammstein/du-hast-video_126711d81.html")
         self.assertEqual(data, "plugin://plugin.video.youtube/play/?video_id=W3q8Od5qJio")
 
+    @unittest.skipIf(travis_env, "Requires version 0.9.2 of codequick in kodi repo")
     def test_video_decode_clips(self):
         data = addon.play_video.test(url="/buckcherry/crazy-bitch-video_6bf13e2a4.html")
         self.assertEqual(data, "http://metalvideo.com/videos.php?vid=6bf13e2a4")
 
+    @unittest.skipIf(travis_env, "Requires version 0.9.2 of codequick in kodi repo")
     def test_party_play(self):
         data = addon.party_play.test(url="/sanctification/storm-video_44f0b3076.html")
         self.assertEqual(data["path"], "plugin://plugin.video.youtube/play/?video_id=tUhkkYoeQK0")
@@ -77,6 +85,7 @@ class Tester(unittest.TestCase):
         self.assertEqual(len(plugin_data["playlist"]), 2)
         self.assertEqual(plugin_data["playlist"][1].getLabel(), "_loopback_ - ")
 
+    @unittest.skipIf(travis_env, "Requires version 0.9.2 of codequick in kodi repo")
     def test_party_play_fail(self):
         data = addon.party_play.test(url="http://metalvideo.com/contact_us.html")
         self.assertIsNone(data)
