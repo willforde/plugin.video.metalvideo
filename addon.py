@@ -32,34 +32,6 @@ PARTY_MODE = 589
 # Base url constructor
 url_constructor = utils.urljoin_partial("http://metalvideo.com")
 
-# Patterens to extract video url
-# Copied from the Youtube-DL project
-# https://github.com/rg3/youtube-dl/blob/4471affc348af40409188f133786780edd969623/youtube_dl/extractor/youtube.py#L329
-VALID_URL = r"""(?x)^
-(
- (?:https?://|//)                                     # http(s):// or protocol-independent URL
- (?:(?:(?:(?:\w+\.)?[yY][oO][uU][tT][uU][bB][eE](?:-nocookie)?\.com/|
-    youtube\.googleapis\.com/)                        # the various hostnames, with wildcard subdomains
- (?:.*?\#/)?                                          # handle anchor (#/) redirect urls
- (?:                                                  # the various things that can precede the ID:
-     (?:(?:v|embed|e)/(?!videoseries))                # v/ or embed/ or e/
-     |(?:                                             # or the v= param in all its forms
-         (?:(?:watch|movie)(?:_popup)?(?:\.php)?/?)?  # preceding watch(_popup|.php) or nothing (like /?v=xxxx)
-         (?:\?|\#!?)                                  # the params delimiter ? or # or #!
-         (?:.*?[&;])??                                # any other preceding param (like /?s=tuff&v=xxxx or
-         v=                                           # ?s=tuff&amp;v=V36LpHqtcDY)
-     )
- ))
- |(?:
-    youtu\.be|                                        # just youtu.be/xxxx
-    vid\.plus|                                        # or vid.plus/xxxx
-    zwearz\.com/watch|                                # or zwearz.com/watch/xxxx
- ))
-)?                                                       # all until now is optional -> you can pass the naked ID
-([0-9A-Za-z_-]{11})                                      # here is it! the YouTube video ID
-(?(1).+)?                                                # if we found the ID, everything can follow
-$"""
-
 
 # noinspection PyUnusedLocal
 @Route.register
@@ -258,14 +230,6 @@ def video_list(plugin, url=None, cat=None, search_query=None):
         yield Listitem.next_page(url=next_tag[-1].get("href"))
 
 
-def embeded_videos(video_elem):
-    urls = []
-    urls.extend(video_elem.findall(".//iframe[@src]"))
-    urls.extend(video_elem.findall(".//embed[@src]"))
-    for url in urls:
-        yield url.get("src")
-
-
 @Resolver.register
 def play_video(plugin, url):
     """
@@ -275,18 +239,11 @@ def play_video(plugin, url):
     """
     url = url_constructor(url)
     html = plugin.request.get(url, max_age=0)
-    try:
-        video_elem = html.parse("div", attrs={"id": "Playerholder"})
-    except RuntimeError:
-        return None
 
-    # Attemp to find url using extract_source(YTDL) first
-    video_urls = embeded_videos(video_elem)
-    for url in video_urls:
-        match = re.match(VALID_URL, url)
-        if match is not None:
-            videoid = match.group(2)
-            return "plugin://plugin.video.youtube/play/?video_id={}".format(videoid)
+    # Attemp to find url using extract_youtube first
+    youtube_video = plugin.extract_youtube(html.text)
+    if youtube_video:
+        return youtube_video
 
     # Attemp to search for flash file
     search_regx = 'clips.+?url:\s*\'(http://metalvideo\.com/videos.php\?vid=\S+)\''
