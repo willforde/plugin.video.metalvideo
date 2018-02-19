@@ -255,7 +255,7 @@ def play_video(plugin, url):
     # Attemp to search for direct file
     search_regx = 'file:\s+\'(\S+?)\''
     match = re.search(search_regx, html.text)
-    if match is not None:
+    if match is not None:  # pragma: no branch
         return match.group(1)
 
 
