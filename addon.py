@@ -19,6 +19,7 @@
 
 from __future__ import unicode_literals
 from codequick import Route, Resolver, Listitem, utils, run
+import urlquick
 import xbmcgui
 import re
 
@@ -48,7 +49,7 @@ def root(plugin, content_type="video"):
 
     # Fetch HTML Source
     url = url_constructor("/mobile/category.html")
-    html = plugin.request.get(url, headers={"Cookie": "COOKIE_DEVICE=mobile"})
+    html = urlquick.get(url, headers={"Cookie": "COOKIE_DEVICE=mobile"})
     root_elem = html.parse(u"ul", attrs={"id": "category_listing"})
     for elem in root_elem.iterfind("li"):
         a_tag = elem.find("a")
@@ -65,14 +66,14 @@ def root(plugin, content_type="video"):
 
 
 @Route.register
-def recent_videos(plugin, url="newvideos.php"):
+def recent_videos(_, url="newvideos.php"):
     """
-    :param Route plugin: The plugin parent object.
+    :param Route _: The plugin parent object.
     :param unicode url: The url resource containing recent videos.
     """
     # Fetch HTML Source
     url = url_constructor(url)
-    html = plugin.request.get(url)
+    html = urlquick.get(url)
     root_elem = html.parse("div", attrs={"id": "browse_main"})
     node = root_elem.find("./div[@id='newvideos_results']")[0]
     for elem in node.iterfind("./tr"):
@@ -97,10 +98,10 @@ def recent_videos(plugin, url="newvideos.php"):
 
 
 @Route.register
-def watching_now(plugin):
+def watching_now(_):
     # Fetch HTML Source
     url = url_constructor("/index.html")
-    html = plugin.request.get(url)
+    html = urlquick.get(url)
     root_elem = html.parse("ul", attrs={"id": "mycarousel"})
     for elem in root_elem.iterfind("li"):
         a_tag = elem.find(".//a[@title]")
@@ -122,7 +123,7 @@ def top_videos(plugin):
     # Fetch HTML Source
     plugin.cache_to_disc = True
     url = url_constructor("/topvideos.html")
-    html = plugin.request.get(url)
+    html = urlquick.get(url)
     titles = []
     urls = []
 
@@ -139,7 +140,7 @@ def top_videos(plugin):
     if ret >= 0:
         # Fetch HTML Source
         url = urls[ret]
-        html = plugin.request.get(url)
+        html = urlquick.get(url)
         root_elem = html.parse("div", attrs={"id": "topvideos_results"})
         for elem in root_elem.iterfind(".//tr"):
             if not elem.attrib:
@@ -161,14 +162,14 @@ def top_videos(plugin):
 
 
 @Route.register
-def related(plugin, url):
+def related(_, url):
     """
-    :param Route plugin: The plugin parent object.
+    :param Route _: The plugin parent object.
     :param unicode url: The url of a video.
     """
     # Fetch HTML Source
     url = url_constructor(url)
-    html = plugin.request.get(url)
+    html = urlquick.get(url)
     root_elem = html.parse("div", attrs={"id": "tabs_related"})
 
     # Parse the xml
@@ -202,7 +203,7 @@ def video_list(plugin, url=None, cat=None, search_query=None):
     else:
         url = url_constructor(url)
 
-    html = plugin.request.get(url)
+    html = urlquick.get(url)
     root_elem = html.parse("div", attrs={"id": "browse_main"})
     for elem in root_elem.iterfind(u".//div[@class='video_i']"):
         item = Listitem()
@@ -236,9 +237,10 @@ def play_video(plugin, url):
     :param Resolver plugin: The plugin parent object.
     :param unicode url: The url of a video.
     :returns: A playable video url.
+    :rtype: unicode
     """
     url = url_constructor(url)
-    html = plugin.request.get(url, max_age=0)
+    html = urlquick.get(url, max_age=0)
 
     # Attemp to find url using extract_youtube first
     youtube_video = plugin.extract_youtube(html.text)
