@@ -49,8 +49,8 @@ def root(plugin, content_type="video"):
 
     # Fetch HTML Source
     url = url_constructor("/mobile/category.html")
-    html = urlquick.get(url, headers={"Cookie": "COOKIE_DEVICE=mobile"})
-    root_elem = html.parse(u"ul", attrs={"id": "category_listing"})
+    resp = urlquick.get(url, headers={"Cookie": "COOKIE_DEVICE=mobile"})
+    root_elem = resp.parse(u"ul", attrs={"id": "category_listing"})
     for elem in root_elem.iterfind("li"):
         a_tag = elem.find("a")
         item = Listitem()
@@ -73,8 +73,8 @@ def recent_videos(_, url="newvideos.php"):
     """
     # Fetch HTML Source
     url = url_constructor(url)
-    html = urlquick.get(url)
-    root_elem = html.parse("div", attrs={"id": "browse_main"})
+    resp = urlquick.get(url)
+    root_elem = resp.parse("div", attrs={"id": "browse_main"})
     node = root_elem.find("./div[@id='newvideos_results']")[0]
     for elem in node.iterfind("./tr"):
         if not elem.attrib:
@@ -101,8 +101,8 @@ def recent_videos(_, url="newvideos.php"):
 def watching_now(_):
     # Fetch HTML Source
     url = url_constructor("/index.html")
-    html = urlquick.get(url)
-    root_elem = html.parse("ul", attrs={"id": "mycarousel"})
+    resp = urlquick.get(url)
+    root_elem = resp.parse("ul", attrs={"id": "mycarousel"})
     for elem in root_elem.iterfind("li"):
         a_tag = elem.find(".//a[@title]")
         item = Listitem()
@@ -123,12 +123,12 @@ def top_videos(plugin):
     # Fetch HTML Source
     plugin.cache_to_disc = True
     url = url_constructor("/topvideos.html")
-    html = urlquick.get(url)
+    resp = urlquick.get(url)
     titles = []
     urls = []
 
     # Parse categories
-    root_elem = html.parse("select", attrs={"name": "categories"})
+    root_elem = resp.parse("select", attrs={"name": "categories"})
     for group in root_elem.iterfind("optgroup"):
         for elem in group:
             urls.append(elem.get("value"))
@@ -140,8 +140,8 @@ def top_videos(plugin):
     if ret >= 0:
         # Fetch HTML Source
         url = urls[ret]
-        html = urlquick.get(url)
-        root_elem = html.parse("div", attrs={"id": "topvideos_results"})
+        resp = urlquick.get(url)
+        root_elem = resp.parse("div", attrs={"id": "topvideos_results"})
         for elem in root_elem.iterfind(".//tr"):
             if not elem.attrib:
                 item = Listitem()
@@ -169,8 +169,8 @@ def related(_, url):
     """
     # Fetch HTML Source
     url = url_constructor(url)
-    html = urlquick.get(url)
-    root_elem = html.parse("div", attrs={"id": "tabs_related"})
+    resp = urlquick.get(url)
+    root_elem = resp.parse("div", attrs={"id": "tabs_related"})
 
     # Parse the xml
     for elem in root_elem.iterfind(u"div"):
@@ -203,8 +203,8 @@ def video_list(plugin, url=None, cat=None, search_query=None):
     else:
         url = url_constructor(url)
 
-    html = urlquick.get(url)
-    root_elem = html.parse("div", attrs={"id": "browse_main"})
+    resp = urlquick.get(url)
+    root_elem = resp.parse("div", attrs={"id": "browse_main"})
     for elem in root_elem.iterfind(u".//div[@class='video_i']"):
         item = Listitem()
         item.art["thumb"] = elem.find(".//img").get("src")
