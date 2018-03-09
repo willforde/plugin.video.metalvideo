@@ -43,8 +43,8 @@ def root(plugin, content_type="video"):
                              we have no use for it as of yet.
     """
     yield Listitem.recent(recent_videos)
-    yield Listitem.from_dict(plugin.localize(TOP_VIDEOS), top_videos)
-    yield Listitem.from_dict(plugin.localize(WATCHING_NOW), watching_now)
+    yield Listitem.from_dict(top_videos, plugin.localize(TOP_VIDEOS))
+    yield Listitem.from_dict(watching_now, plugin.localize(WATCHING_NOW))
     yield Listitem.search(video_list)
 
     # Fetch HTML Source
@@ -61,8 +61,8 @@ def root(plugin, content_type="video"):
         yield item
 
     # Add the video items here so that show at the end of the listing
-    yield Listitem.from_dict(plugin.localize(VIDEO_OF_THE_DAY), play_video, params={"url": "index.html"})
-    yield Listitem.from_dict(plugin.localize(PARTY_MODE), party_play, params={"url": "randomizer.php"})
+    yield Listitem.from_dict(play_video, plugin.localize(VIDEO_OF_THE_DAY), params={"url": "index.html"})
+    yield Listitem.from_dict(party_play, plugin.localize(PARTY_MODE), params={"url": "randomizer.php"})
 
 
 @Route.register
