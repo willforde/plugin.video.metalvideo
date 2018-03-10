@@ -98,5 +98,4 @@ ENV/
 # PyCharm
 .idea/
 
-# Addondev
-.kodi/
+.pytest_cache/
