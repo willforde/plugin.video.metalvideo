@@ -43,8 +43,8 @@ def root(plugin, content_type="video"):
                              we have no use for it as of yet.
     """
     yield Listitem.recent(recent_videos)
-    yield Listitem.from_dict(top_videos, plugin.localize(TOP_VIDEOS))
-    yield Listitem.from_dict(watching_now, plugin.localize(WATCHING_NOW))
+    yield Listitem.from_dict(top_videos, "[B]{}[/B]".format(plugin.localize(TOP_VIDEOS)))
+    yield Listitem.from_dict(watching_now, "[B]{}[/B]".format(plugin.localize(WATCHING_NOW)))
     yield Listitem.search(video_list)
 
     # Fetch HTML Source
@@ -61,7 +61,8 @@ def root(plugin, content_type="video"):
         yield item
 
     # Add the video items here so that show at the end of the listing
-    yield Listitem.from_dict(play_video, plugin.localize(VIDEO_OF_THE_DAY), params={"url": "index.html"})
+    bold_text = "[B]{}[/B]".format(plugin.localize(VIDEO_OF_THE_DAY))
+    yield Listitem.from_dict(play_video, bold_text, params={"url": "index.html"})
     yield Listitem.from_dict(party_play, plugin.localize(PARTY_MODE), params={"url": "randomizer.php"})
 
 
@@ -136,7 +137,7 @@ def top_videos(plugin):
 
     # Display list for Selection
     dialog = xbmcgui.Dialog()
-    ret = dialog.select(plugin.localize(SELECT_TOP), titles)
+    ret = dialog.select("[B]{}[/B]".format(plugin.localize(SELECT_TOP)), titles)
     if ret >= 0:
         # Fetch HTML Source
         url = urls[ret]
