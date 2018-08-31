@@ -1,5 +1,8 @@
 [run]
-source=addon
+branch=True
+source =
+    addon
+    resources
 
 [report]
 exclude_lines =
