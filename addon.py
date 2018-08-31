@@ -34,6 +34,10 @@ PARTY_MODE = 589
 url_constructor = utils.urljoin_partial("http://metalvideo.com")
 
 
+def bold(text):  # type: (str) -> str
+    return "[B]{}[/B]".format(text)
+
+
 # noinspection PyUnusedLocal
 @Route.register
 def root(plugin, content_type="video"):
@@ -43,8 +47,8 @@ def root(plugin, content_type="video"):
                              we have no use for it as of yet.
     """
     yield Listitem.recent(recent_videos)
-    yield Listitem.from_dict(top_videos, "[B]{}[/B]".format(plugin.localize(TOP_VIDEOS)))
-    yield Listitem.from_dict(watching_now, "[B]{}[/B]".format(plugin.localize(WATCHING_NOW)))
+    yield Listitem.from_dict(top_videos, bold(plugin.localize(TOP_VIDEOS)))
+    yield Listitem.from_dict(watching_now, bold(plugin.localize(WATCHING_NOW)))
     yield Listitem.search(video_list)
 
     # Fetch HTML Source
@@ -61,7 +65,7 @@ def root(plugin, content_type="video"):
         yield item
 
     # Add the video items here so that show at the end of the listing
-    bold_text = "[B]{}[/B]".format(plugin.localize(VIDEO_OF_THE_DAY))
+    bold_text = bold(plugin.localize(VIDEO_OF_THE_DAY))
     yield Listitem.from_dict(play_video, bold_text, params={"url": "index.html"})
     yield Listitem.from_dict(party_play, plugin.localize(PARTY_MODE), params={"url": "randomizer.php"})
 
