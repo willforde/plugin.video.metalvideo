@@ -2,7 +2,8 @@
 from __future__ import unicode_literals
 
 # noinspection PyUnresolvedReferences
-from codequick import Route, Resolver, Listitem, utils, run
+from codequick import Route, Resolver, Listitem, run
+from codequick.utils import urljoin_partial, bold
 import urlquick
 import xbmcgui
 import re
@@ -14,12 +15,8 @@ TOP_VIDEOS = 30002
 SELECT_TOP = 30001
 PARTY_MODE = 589
 
-# Base url constructor
-url_constructor = utils.urljoin_partial("http://metalvideo.com")
-
-
-def bold(text):  # type: (str) -> str
-    return "[B]{}[/B]".format(text)
+base_url = "https://metalvideo.com"
+url_constructor = urljoin_partial(base_url)
 
 
 # noinspection PyUnusedLocal
@@ -30,87 +27,43 @@ def root(plugin, content_type="video"):
     :param str content_type: The type of content been listed e.g. video, music. This is passed in from kodi and
                              we have no use for it as of yet.
     """
-    yield Listitem.recent(recent_videos)
+    yield Listitem.recent(video_list, url="newvideos.html")
     yield Listitem.from_dict(top_videos, bold(plugin.localize(TOP_VIDEOS)))
     yield Listitem.from_dict(watching_now, bold(plugin.localize(WATCHING_NOW)))
-    yield Listitem.search(video_list)
+    yield Listitem.search(search_videos)
 
     # Fetch HTML Source
-    url = url_constructor("/mobile/category.html")
-    resp = urlquick.get(url, headers={"Cookie": "COOKIE_DEVICE=mobile"})
-    root_elem = resp.parse(u"ul", attrs={"id": "category_listing"})
-    for elem in root_elem.iterfind("li"):
-        a_tag = elem.find("a")
+    url = url_constructor("/browse.html")
+    resp = urlquick.get(url)
+    root_elem = resp.parse("div", attrs={"id": "primary"})
+    for elem in root_elem.iterfind("ul/li"):
+        img = elem.find(".//img")
         item = Listitem()
 
-        # Set label with video count added
-        item.label = "%s (%s)" % (a_tag.text, elem.find("span").text)
-        item.set_callback(video_list, cat=a_tag.get("href"))
+        # The image tag contains both the image url and title
+        item.label = img.get("alt")
+        item.art["thumb"] = img.get("src")
+
+        url = elem.find("div/a").get("href")
+        item.set_callback(video_list, url=url)
         yield item
 
     # Add the video items here so that show at the end of the listing
     bold_text = bold(plugin.localize(VIDEO_OF_THE_DAY))
-    yield Listitem.from_dict(play_video, bold_text, params={"url": "index.html"})
-    yield Listitem.from_dict(party_play, plugin.localize(PARTY_MODE), params={"url": "randomizer.php"})
+    yield Listitem.from_dict(play_video, bold_text, params={"url": "/index.html"})
+    yield Listitem.from_dict(party_play, plugin.localize(PARTY_MODE), params={"url": "/randomizer.php"})
 
 
 @Route.register
-def recent_videos(_, url="newvideos.php"):
-    """
-    :param Route _: The plugin parent object.
-    :param unicode url: The url resource containing recent videos.
-    """
-    # Fetch HTML Source
-    url = url_constructor(url)
-    resp = urlquick.get(url)
-    root_elem = resp.parse("div", attrs={"id": "browse_main"})
-    node = root_elem.find("./div[@id='newvideos_results']")[0]
-    for elem in node.iterfind("./tr"):
-        if not elem.attrib:
-            item = Listitem()
-            item.art["thumb"] = elem.find(".//img").get("src")
-
-            artist = elem[1].text
-            track = elem[1][0][0].text
-            item.label = "%s - %s" % (artist, track)
-            item.info["artist"] = [artist]
-
-            url = elem.find(".//a").get("href")
-            item.context.related(related, url=url)
-            item.set_callback(play_video, url=url)
-            yield item
-
-    # Fetch next page url
-    next_tag = root_elem.findall("./div[@class='pagination']/a")
-    if next_tag and next_tag[-1].text.startswith("next"):
-        yield Listitem.next_page(url=next_tag[-1].get("href"))
-
-
-@Route.register
-def watching_now(_):
-    # Fetch HTML Source
-    url = url_constructor("/index.html")
-    resp = urlquick.get(url)
-    root_elem = resp.parse("ul", attrs={"id": "mycarousel"})
-    for elem in root_elem.iterfind("li"):
-        a_tag = elem.find(".//a[@title]")
-        item = Listitem()
-
-        # Fetch label & thumb
-        item.label = a_tag.text
-        item.art["thumb"] = elem.find(".//img").get("src")
-
-        url = a_tag.get("href")
-        item.context.related(related, url=url)
-        item.set_callback(play_video, url=url)
-        yield item
+def search_videos(plugin, search_query):
+    url = url_constructor("/search.php?keywords={}&video-id=".format(search_query))
+    return video_list(plugin, url)
 
 
 @Route.register
 def top_videos(plugin):
     """:param Route plugin: The plugin parent object."""
     # Fetch HTML Source
-    plugin.cache_to_disc = True
     url = url_constructor("/topvideos.html")
     resp = urlquick.get(url)
     titles = []
@@ -118,36 +71,87 @@ def top_videos(plugin):
 
     # Parse categories
     root_elem = resp.parse("select", attrs={"name": "categories"})
-    for group in root_elem.iterfind("optgroup"):
-        for elem in group:
-            urls.append(elem.get("value"))
-            titles.append(elem.text.strip())
+    for group in root_elem.iterfind("optgroup[@label]"):
+        if group.get("label").lower().startswith("by"):
+            for node in group:
+                urls.append(node.get("value"))
+                titles.append(node.text.strip())
 
     # Display list for Selection
     dialog = xbmcgui.Dialog()
     ret = dialog.select("[B]{}[/B]".format(plugin.localize(SELECT_TOP)), titles)
     if ret >= 0:
-        # Fetch HTML Source
-        url = urls[ret]
-        resp = urlquick.get(url)
-        root_elem = resp.parse("div", attrs={"id": "topvideos_results"})
-        for elem in root_elem.iterfind(".//tr"):
-            if not elem.attrib:
-                item = Listitem()
-                a_tag = elem[3][0]
-
-                artist = elem[2].text
-                item.label = "%s %s - %s" % (elem[0].text, artist, a_tag.text)
-                item.art["thumb"] = elem.find(".//img").get("src")
-                item.info["count"] = elem[4].text.replace(",", "")
-                item.info["artist"] = [artist]
-
-                url = a_tag.get("href")
-                item.context.related(related, url=url)
-                item.set_callback(play_video, url=url)
-                yield item
+        return video_list(plugin, url=urls[ret])
     else:
-        yield False
+        return False
+
+
+@Route.register
+def watching_now(_):
+    # Fetch HTML Source
+    url = url_constructor("/index.html")
+    resp = urlquick.get(url, max_age=0)
+    root_elem = resp.parse("ul", attrs={"id": "pm-ul-wn-videos"})
+    for elem in root_elem.iterfind("li/div"):
+        img = elem.find(".//img")
+        item = Listitem()
+
+        # The image tag contains both the image url and title
+        item.label = img.get("alt")
+        item.art["thumb"] = img.get("src")
+
+        url = elem.find("span/a").get("href")
+        item.context.related(related, url=url)
+        item.set_callback(play_video, url=url)
+        yield item
+
+
+@Route.register
+def video_list(_, url):
+    """
+    :param Route _: The plugin parent object.
+    :param unicode url: The url resource containing recent videos.
+    """
+    # Fetch HTML Source
+    url = url_constructor(url)
+    resp = urlquick.get(url)
+    root_elem = resp.parse("div", attrs={"class": "primary-content"})
+    for elem in root_elem.find("ul").iterfind("./li/div"):
+        item = Listitem()
+        item.art["thumb"] = elem.find(".//img").get("src")
+        item.info["duration"] = elem.find("span/span/span").text
+        item.info["plot"] = elem.find("p").text
+
+        # View count
+        views = elem.find("./div/span[@class='pm-video-attr-numbers']/small").text
+        item.info["count"] = views.split(" ", 1)[0].strip()
+
+        # Date of video
+        date = elem.find(".//time[@datetime]").get("datetime")
+        date = date.split("T", 1)[0]
+        item.info.date(date, "%Y-%m-%d")  # 2018-10-19
+
+        # Url to video & name
+        a_tag = elem.find("h3/a")
+        url = a_tag.get("href")
+        item.label = a_tag.text
+
+        # Extract the artist name from the title
+        item.info["artist"] = [a_tag.text.split("-", 1)[0].strip()]
+
+        item.context.related(related, url=url)
+        item.set_callback(play_video, url=url)
+        yield item
+
+    # Fetch next page url
+    next_tag = root_elem.find("./div[@class='pagination pagination-centered']/ul")
+    if next_tag is not None:
+        next_tag = next_tag.findall("li/a")
+        next_tag.reverse()
+        for node in next_tag:
+            if node.text == u"\xbb":
+                yield Listitem.next_page(url=node.get("href"), callback=video_list)
+                break
 
 
 @Route.register
@@ -159,65 +163,25 @@ def related(_, url):
     # Fetch HTML Source
     url = url_constructor(url)
     resp = urlquick.get(url)
-    root_elem = resp.parse("div", attrs={"id": "tabs_related"})
-
-    # Parse the xml
-    for elem in root_elem.iterfind(u"div"):
-        a_tag = elem.find("./a[@class='song_name']")
-
+    root_elem = resp.parse("div", attrs={"id": "bestincategory"})
+    for elem in root_elem.iterfind("ul/li/div"):
+        img = elem.find(".//img")
         item = Listitem()
-        item.label = a_tag.text
-        item.art["thumb"] = elem.find("./a/img").get("src")
 
-        url = a_tag.get("href")
+        # The image tag contains both the image url and title
+        item.label = img.get("alt")
+        item.art["thumb"] = img.get("src")
+
+        # Video duration
+        item.info["duration"] = elem.find("span/span/span").text
+
+        # View count
+        item.info["count"] = elem.find("div/span/small").text.split(" ")[0].strip()
+
+        url = elem.find("span/a").get("href")
         item.context.related(related, url=url)
         item.set_callback(play_video, url=url)
         yield item
-
-
-@Route.register
-def video_list(plugin, url=None, cat=None, search_query=None):
-    """
-    :param Route plugin: The plugin parent object.
-    :param unicode url: The url resource containing lists of videos or next page.
-    :param unicode cat: A category url e.g. Alternative, Folk Metal.
-    :param unicode search_query: The video search term to use for searching.
-    """
-    if search_query:
-        url = url_constructor("search.php?keywords=%s&btn=Search" % search_query)
-    elif cat:
-        sortby = (u"date.html", u"artist.html", u"rating.html", u"views.html")[plugin.setting.get_int("sort")]
-        base, _ = url_constructor(cat).rsplit("-", 1)
-        url = "-".join((base, sortby))
-    else:
-        url = url_constructor(url)
-
-    resp = urlquick.get(url)
-    root_elem = resp.parse("div", attrs={"id": "browse_main"})
-    for elem in root_elem.iterfind(u".//div[@class='video_i']"):
-        item = Listitem()
-        item.art["thumb"] = elem.find(".//img").get("src")
-
-        # Extract url and remove first 'a' tag section
-        # This makes it easir to extract 'artist' and 'song' name later
-        a_tag = elem.find("a")
-        url = a_tag.get("href")
-        elem.remove(a_tag)
-
-        # Fetch title
-        span_tags = tuple(node.text for node in elem.findall(".//span"))
-        item.label = "%s - %s" % span_tags
-        item.info["artist"] = [span_tags[0]]
-
-        # Add related video context item
-        item.context.related(related, url=url)
-        item.set_callback(play_video, url=url)
-        yield item
-
-    # Fetch next page url
-    next_tag = root_elem.findall(".//div[@class='pagination']/a")
-    if next_tag and next_tag[-1].text.startswith("next"):
-        yield Listitem.next_page(url=next_tag[-1].get("href"))
 
 
 @Resolver.register
