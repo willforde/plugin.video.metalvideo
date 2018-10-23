@@ -91,19 +91,23 @@ def watching_now(_):
     # Fetch HTML Source
     url = url_constructor("/index.html")
     resp = urlquick.get(url, max_age=0)
-    root_elem = resp.parse("ul", attrs={"id": "pm-ul-wn-videos"})
-    for elem in root_elem.iterfind("li/div"):
-        img = elem.find(".//img")
-        item = Listitem()
+    try:
+        root_elem = resp.parse("ul", attrs={"id": "pm-ul-wn-videos"})
+    except RuntimeError:
+        pass
+    else:
+        for elem in root_elem.iterfind("li/div"):
+            img = elem.find(".//img")
+            item = Listitem()
 
-        # The image tag contains both the image url and title
-        item.label = img.get("alt")
-        item.art["thumb"] = img.get("src")
+            # The image tag contains both the image url and title
+            item.label = img.get("alt")
+            item.art["thumb"] = img.get("src")
 
-        url = elem.find("span/a").get("href")
-        item.context.related(related, url=url)
-        item.set_callback(play_video, url=url)
-        yield item
+            url = elem.find("span/a").get("href")
+            item.context.related(related, url=url)
+            item.set_callback(play_video, url=url)
+            yield item
 
 
 @Route.register
