@@ -2,7 +2,6 @@ from addondev import testing, plugin_data
 import unittest
 
 # Testing specific imports
-import codequick
 from addon import main as addon
 
 
