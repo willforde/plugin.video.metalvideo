@@ -19,48 +19,52 @@ class Tester(unittest.TestCase):
         self.assertGreaterEqual(len(data), 30)
 
     def test_recent(self):
-        data = addon.recent_videos.test()
-        self.assertGreaterEqual(len(data), 50)
+        data = addon.video_list.test("newvideos.html")
+        self.assertGreaterEqual(len(data), 20)
 
     def test_recent_next(self):
-        data = addon.recent_videos.test("newvideos.html?&page=2")
-        self.assertGreaterEqual(len(data), 50)
+        data = addon.video_list.test("newvideos.html?&page=2")
+        self.assertGreaterEqual(len(data), 20)
 
     def test_watching_now(self):
         data = addon.watching_now.test()
-        self.assertGreaterEqual(len(data), 5)
+        self.assertGreaterEqual(len(data), 0)
 
     def test_related(self):
-        data = addon.related.test("http://metalvideo.com/the-silenced/end-machine-video_b71b5fcca.html")
+        data = addon.related.test("/accept-balls-to-the-wall-live-2017_61be7e88a.html")
         self.assertEqual(len(data), 10)
 
     def test_video_list_cat(self):
-        data = addon.video_list.test(cat="http://metalvideo.com/mobile/browse-concerts-videos-1-date.html")
+        data = addon.video_list.test("/browse-alternative-videos-1-date.html")
         self.assertGreaterEqual(len(data), 25)
 
     def test_video_list_next(self):
-        data = addon.video_list.test(url="browse-concerts-videos-2-date.html")
+        data = addon.video_list.test("/browse-classic_metal-videos-2-date.html")
         self.assertGreaterEqual(len(data), 25)
 
     def test_video_list_search(self):
-        data = addon.video_list.test(search_query="rock")
+        data = addon.search_videos.test(search_query="rock")
         self.assertGreaterEqual(len(data), 25)
 
     def test_top_all(self):
         with testing.mock_select_dialog(0):
             data = addon.top_videos.test()
-        self.assertGreaterEqual(len(data), 50)
+        self.assertGreaterEqual(len(data), 30)
 
-    def test_top_converts(self):
+    def test_top_death_metal(self):
         with testing.mock_select_dialog(5):
             data = addon.top_videos.test()
-        self.assertGreaterEqual(len(data), 50)
+        self.assertGreaterEqual(len(data), 15)
+
+    def test_top_alternative(self):
+        with testing.mock_select_dialog(2):
+            data = addon.top_videos.test()
+        self.assertGreaterEqual(len(data), 30)
 
     def test_top_skip(self):
         with testing.mock_select_dialog(-1):
             data = addon.top_videos.test()
-        self.assertEqual(len(data), 1)
-        self.assertFalse(data[0])
+        self.assertFalse(data)
 
     # @unittest.skipUnless(framework_version >= (0, 9, 2), "Only work on v0.9.2 and up of codequick")
     # def test_video_decode_youtube_iframe(self):
