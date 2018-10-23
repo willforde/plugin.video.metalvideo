@@ -195,10 +195,10 @@ def play_video(plugin, url):
     url = url_constructor(url)
     html = urlquick.get(url, max_age=0)
 
-    # Attemp to find url using extract_youtube first
-    youtube_video = plugin.extract_youtube(html.text)
-    if youtube_video:
-        return youtube_video
+    # Attemp to find url using extract_source first
+    video_url = plugin.extract_source(url)
+    if video_url:
+        return video_url
 
     # Attemp to search for flash file
     search_regx = 'clips.+?url:\s*\'(http://metalvideo\.com/videos.php\?vid=\S+)\''
