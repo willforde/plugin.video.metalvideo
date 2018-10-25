@@ -15,8 +15,8 @@ TOP_VIDEOS = 30002
 SELECT_TOP = 30001
 PARTY_MODE = 589
 
-base_url = "https://metalvideo.com"
-url_constructor = urljoin_partial(base_url)
+BASE_URL = "https://metalvideo.com"
+url_constructor = urljoin_partial(BASE_URL)
 
 
 # noinspection PyUnusedLocal
@@ -123,8 +123,8 @@ def video_list(_, url):
     for elem in root_elem.find("ul").iterfind("./li/div"):
         item = Listitem()
         item.art["thumb"] = elem.find(".//img").get("src")
-        item.info["duration"] = elem.find("span/span/span").text
-        item.info["plot"] = elem.find("p").text
+        item.info["duration"] = elem.find("span/span/span").text.strip()
+        item.info["plot"] = elem.find("p").text.strip()
 
         # View count
         views = elem.find("./div/span[@class='pm-video-attr-numbers']/small").text
@@ -197,13 +197,12 @@ def play_video(plugin, url):
     :rtype: unicode
     """
     url = url_constructor(url)
-    html = urlquick.get(url, max_age=0)
-
     # Attemp to find url using extract_source first
     video_url = plugin.extract_source(url)
     if video_url:
         return video_url
 
+    html = urlquick.get(url, max_age=0)
     # Attemp to search for flash file
     search_regx = 'clips.+?url:\s*\'(http://metalvideo\.com/videos.php\?vid=\S+)\''
     match = re.search(search_regx, html.text)
