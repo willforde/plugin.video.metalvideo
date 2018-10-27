@@ -197,12 +197,18 @@ def play_video(plugin, url):
     :rtype: unicode
     """
     url = url_constructor(url)
-    # Attemp to find url using extract_source first
-    video_url = plugin.extract_source(url)
-    if video_url:
-        return video_url
-
     html = urlquick.get(url, max_age=0)
+
+    # Attemp to find url using extract_source first
+    # video_url = plugin.extract_source(url)
+    # if video_url:
+    #     return video_url
+
+    # Attemp to find url using extract_youtube first
+    youtube_video = plugin.extract_youtube(html.text)
+    if youtube_video:
+        return youtube_video
+
     # Attemp to search for flash file
     search_regx = 'clips.+?url:\s*\'(http://metalvideo\.com/videos.php\?vid=\S+)\''
     match = re.search(search_regx, html.text)
