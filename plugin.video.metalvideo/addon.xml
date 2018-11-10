@@ -26,5 +26,6 @@
             <screenshot>resources/screenshots/screenshot002.jpg</screenshot>
         </assets>
         <news>[fix] Fixed playback problem with Kodi on Xbox.</news>
+        <reuselanguageinvoker>true</reuselanguageinvoker>
     </extension>
 </addon>
