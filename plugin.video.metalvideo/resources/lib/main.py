@@ -154,7 +154,7 @@ def video_list(_, url):
     # Fetch next page url
     next_tag = root_elem.find("./div[@class='pagination pagination-centered']/ul")
     if next_tag is not None:
-        next_tag = next_tag.findall("li/a")
+        next_tag = next_tag.findall("li[@class='']/a")
         next_tag.reverse()
         for node in next_tag:
             if node.text == u"\xbb":
