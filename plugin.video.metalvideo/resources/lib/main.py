@@ -123,8 +123,12 @@ def video_list(_, url):
     for elem in root_elem.find("ul").iterfind("./li/div"):
         item = Listitem()
         item.art["thumb"] = elem.find(".//img").get("src")
-        item.info["duration"] = elem.find("span/span/span").text.strip()
         item.info["plot"] = elem.find("p").text.strip()
+
+        # Find duration
+        node = elem.find("span/span/span")
+        if node is not None:
+            item.info["duration"] = node.text.strip()
 
         # View count
         views = elem.find("./div/span[@class='pm-video-attr-numbers']/small").text
