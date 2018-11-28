@@ -127,7 +127,7 @@ def video_list(_, url):
 
         # Find duration
         node = elem.find("span/span/span")
-        if node is not None:
+        if node is not None and "pm-label-duration" in node.get("class"):
             item.info["duration"] = node.text.strip()
 
         # View count
@@ -180,8 +180,10 @@ def related(_, url):
         item.label = img.get("alt")
         item.art["thumb"] = img.get("src")
 
-        # Video duration
-        item.info["duration"] = elem.find("span/span/span").text
+        # Find duration
+        node = elem.find("span/span/span")
+        if node is not None and "pm-label-duration" in node.get("class"):
+            item.info["duration"] = node.text.strip()
 
         # View count
         item.info["count"] = elem.find("div/span/small").text.split(" ")[0].strip()
