@@ -3,7 +3,6 @@
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
         <import addon="script.module.codequick" version="0.9.6"/>
-        <import addon="plugin.video.youtube" version="5.0.0"/>
     </requires>
     <extension point="xbmc.python.pluginsource" library="addon.py">
         <provides>audio video</provides>
