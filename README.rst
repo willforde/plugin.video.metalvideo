@@ -24,3 +24,4 @@ The add-on is available in the official kodi repository for kodi v17 "Krypton" a
 .. image:: plugin.video.metalvideo/resources/screenshots/screenshot002.jpg
 
 **Automated Tests:** https://travis-ci.org/willforde/plugin.video.metalvideo
+**Kodi Forum** https://forum.kodi.tv/showthread.php?tid=178798
