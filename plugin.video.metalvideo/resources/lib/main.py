@@ -132,7 +132,7 @@ def video_list(_, url):
 
         # View count
         views = elem.find("./div/span[@class='pm-video-attr-numbers']/small").text
-        item.info["count"] = views.split(" ", 1)[0].strip()
+        item.info["count"] = views.split(" ", 1)[0].strip().replace(",", "")
 
         # Date of video
         date = elem.find(".//time[@datetime]").get("datetime")
