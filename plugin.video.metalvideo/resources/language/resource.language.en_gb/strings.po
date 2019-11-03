@@ -21,20 +21,17 @@ msgstr ""
 ###############################
 
 msgctxt "#30001"
-msgid "Please Select Top 50"
+msgid "Please Select Top Videos"
 msgstr ""
 
 msgctxt "#30002"
-msgid "Top 50 Videos"
-msgstr ""
-
-msgctxt "#30004"
-msgid "Video of the day"
+msgid "Top Videos"
 msgstr ""
 
 msgctxt "#30005"
-msgid "Being watched right now"
+msgid "Featured"
 msgstr ""
+
 
 ##################################
 # Settings Codes: 30300 to 30399 #

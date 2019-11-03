@@ -8,11 +8,10 @@ import urlquick
 import xbmcgui
 
 # Localized string Constants
-VIDEO_OF_THE_DAY = 30004
-POPULAR_VIDEOS = 30002
 SELECT_TOP = 30001
 TOP_VIDEOS = 30002
-
+FEATURED = 30005
+PARTY_MODE = 589
 
 BASE_URL = "https://metalvideo.com"
 url_constructor = urljoin_partial(BASE_URL)
@@ -26,8 +25,9 @@ def root(plugin, content_type="video"):
     :param str content_type: The type of content being listed e.g. video, music. This is passed in from kodi and
                              we have no use for it as of yet.
     """
-    yield Listitem.recent(video_list, url="newvideos.html")
-    yield Listitem.from_dict(video_list, bold(plugin.localize(POPULAR_VIDEOS)), params={"url": "topvideos.html"})
+    yield Listitem.recent(video_list, url="/newvideos.html")
+    yield Listitem.from_dict(top_videos, bold(plugin.localize(TOP_VIDEOS)))
+    yield Listitem.from_dict(video_list, bold(plugin.localize(FEATURED)), params={"url": "/index.html", "filter_mode": 2})
     yield Listitem.search(search_videos)
 
     # List Categories
@@ -39,14 +39,18 @@ def root(plugin, content_type="video"):
 
         item.label = url_tag.find("h3").text
         item.art["thumb"] = url_tag.find(".//img").get("src")
-
         url = url_tag.get("href")
+
+        # Add Context menu item to sort by Views, Ratings and/or Title
+        for sort in ("views", "rating", "title"):
+            sort_url = url.replace("date.html", "{}.html".format(sort))
+            item.context.container(video_list, "By {}".format(sort), url=sort_url)
+
         item.set_callback(video_list, url=url)
         yield item
 
     # Video of the day
-    bold_text = bold(plugin.localize(VIDEO_OF_THE_DAY))
-    yield Listitem.from_dict(play_video, bold_text, params={"url": "/index.html"})
+    yield Listitem.from_dict(party_play, plugin.localize(PARTY_MODE), params={"url": "/index.html"})
 
 
 @Route.register
@@ -56,22 +60,55 @@ def search_videos(plugin, search_query):
 
 
 @Route.register
-def video_list(_, url, related_mode=False):
+def top_videos(plugin):
+    """:param Route plugin: The plugin parent object."""
+
+    links = [
+        ("All time", "https://www.metalvideo.com/topvideos.html"),
+        ("Highest rated", "https://www.metalvideo.com/topvideos.html?do=rating"),
+        ("Last 3 days", "https://www.metalvideo.com/topvideos.html?do=recent")
+    ]
+
+    resp = urlquick.get(url_constructor("/topvideos.html"))
+    root_elem = resp.parse("ul", attrs={"role": "menu"})
+    for link in root_elem.iterfind(".//a"):
+        href = link.get("href")
+        if "topvideos.html?c=" in href:
+            links.append((link.text, href))
+
+    # Display list for Selection
+    dialog = xbmcgui.Dialog()
+    titles, urls = zip(*links)
+    ret = dialog.select("[B]{}[/B]".format(plugin.localize(SELECT_TOP)), titles)
+    if ret >= 0:
+        return video_list(plugin, url=urls[ret])
+    else:
+        return False
+
+
+@Route.register
+def video_list(_, url, filter_mode=0):
     """
     List all videos
 
     :param Route _: The plugin parent object.
     :param str url: The url resource containing recent videos.
-    :param bool related_mode: Switch for related video or normal videos.
+    :param bool filter_mode: Switch to filter results by related video, normal videos or featured videos.
     """
     resp = urlquick.get(url_constructor(url))
+
     # Filter results depending on related mode
-    if related_mode:
-        root_elem = resp.parse("ul", attrs={"class": "pm-ul-sidelist-videos list-unstyled"})
-        results = root_elem.iterfind("li")
-    else:
+    if filter_mode == 0:
         root_elem = resp.parse("div", attrs={"class": "col-md-12"})
         results = root_elem.iterfind("ul/li/div")
+    elif filter_mode == 1:
+        root_elem = resp.parse("ul", attrs={"class": "pm-ul-sidelist-videos list-unstyled"})
+        results = root_elem.iterfind("li")
+    elif filter_mode == 2:
+        root_elem = resp.parse("ul", attrs={"id": "pm-carousel_featured"})
+        results = root_elem.iterfind("li/div")
+    else:
+        raise ValueError("unexpected filter_mode value: {}".format(filter_mode))
 
     # Process the videos
     for elem in results:
@@ -83,9 +120,10 @@ def video_list(_, url, related_mode=False):
             item.info["duration"] = duration.text.strip()
 
         # Date
-        date = elem.find(".//time").get("datetime")
-        date = date.split("T", 1)[0]
-        item.info.date(date, "%Y-%m-%d")  # 2018-10-19
+        date = elem.find(".//time")
+        if date is not None:
+            date = date.get("datetime").split("T", 1)[0]
+            item.info.date(date, "%Y-%m-%d")  # 2018-10-19
 
         # Video url
         url_tag = elem.find(".//a[@class='ellipsis']")
@@ -97,12 +135,12 @@ def video_list(_, url, related_mode=False):
         img = elem.find(".//img").attrib
         item.art["thumb"] = img.get("data-echo" if "data-echo" in img else "src")
 
-        item.context.related(video_list, url=url, related_mode=True)
+        item.context.related(video_list, url=url, filter_mode=1)
         item.set_callback(play_video, url=url)
         yield item
 
     # Fetch next page url
-    if related_mode is False:
+    if filter_mode == 0:
         next_tag = root_elem.find(".//ul[@class='pagination pagination-sm pagination-arrows']")
         if next_tag is not None:
             next_tag = next_tag.findall("li[@class='']/a")
@@ -113,32 +151,6 @@ def video_list(_, url, related_mode=False):
                     break
 
 
-@Route.register
-def top_videos(plugin):
-    """:param Route plugin: The plugin parent object."""
-    # Fetch HTML Source
-    url = url_constructor("/topvideos.html")
-    resp = urlquick.get(url)
-    titles = []
-    urls = []
-
-    # Parse categories
-    root_elem = resp.parse("select", attrs={"name": "categories"})
-    for group in root_elem.iterfind("optgroup[@label]"):
-        if group.get("label").lower().startswith("by"):
-            for node in group:
-                urls.append(node.get("value"))
-                titles.append(node.text.strip())
-
-    # Display list for Selection
-    dialog = xbmcgui.Dialog()
-    ret = dialog.select("[B]{}[/B]".format(plugin.localize(SELECT_TOP)), titles)
-    if ret >= 0:
-        return video_list(plugin, url=urls[ret])
-    else:
-        return False
-
-
 @Resolver.register
 def play_video(plugin, url):
     """
@@ -147,3 +159,29 @@ def play_video(plugin, url):
     """
     url = url_constructor(url)
     return plugin.extract_source(url)
+
+
+@Resolver.register
+def party_play(plugin, url):
+    """
+    :param Resolver plugin: The plugin parent object.
+    :param str url: The url to a video.
+    :return: A playlist with the first item been a playable video url and the seconde been a callback url that
+             will fetch the next video url to play.
+    """
+    # Attempt to fetch a video url 3 times
+    attempts = 0
+    while attempts < 3:
+        try:
+            video_url = play_video(plugin, url)
+        except Exception as e:
+            # Raise the Exception if we are on the last run of the loop
+            if attempts == 2:
+                raise e
+        else:
+            if video_url:
+                # Break from loop when we have a url
+                return plugin.create_loopback(video_url)
+
+        # Increment attempts counter
+        attempts += 1

@@ -21,20 +21,17 @@ msgstr ""
 # Addon Codes: 30000 to 30199 #
 # ##############################
 msgctxt "#30001"
-msgid "Please Select Top 50"
-msgstr "אנא בחר את 50 המובחרים"
+msgid "Please Select Top Videos"
+msgstr "אנא בחר בסרטונים המובילים"
 
 msgctxt "#30002"
-msgid "Top 50 Videos"
-msgstr "50 הסרטים המובילים"
-
-msgctxt "#30004"
-msgid "Video of the day"
-msgstr "הסרט של היום"
+msgid "Top Videos"
+msgstr "הסרטים המובילים"
 
 msgctxt "#30005"
-msgid "Being watched right now"
-msgstr "צופים עכשיו"
+msgid "Featured"
+msgstr "מומלצים"
+
 
 # #################################
 # Settings Codes: 30300 to 30399 #
