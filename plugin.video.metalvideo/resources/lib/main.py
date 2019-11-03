@@ -5,10 +5,12 @@ from __future__ import unicode_literals
 from codequick import Route, Resolver, Listitem, run
 from codequick.utils import urljoin_partial, bold
 import urlquick
+import xbmcgui
 
 # Localized string Constants
 VIDEO_OF_THE_DAY = 30004
 POPULAR_VIDEOS = 30002
+SELECT_TOP = 30001
 
 BASE_URL = "https://metalvideo.com"
 url_constructor = urljoin_partial(BASE_URL)
@@ -107,6 +109,32 @@ def video_list(_, url, related_mode=False):
                 if node.text == u"\xbb":
                     yield Listitem.next_page(url=node.get("href"), callback=video_list)
                     break
+
+
+@Route.register
+def top_videos(plugin):
+    """:param Route plugin: The plugin parent object."""
+    # Fetch HTML Source
+    url = url_constructor("/topvideos.html")
+    resp = urlquick.get(url)
+    titles = []
+    urls = []
+
+    # Parse categories
+    root_elem = resp.parse("select", attrs={"name": "categories"})
+    for group in root_elem.iterfind("optgroup[@label]"):
+        if group.get("label").lower().startswith("by"):
+            for node in group:
+                urls.append(node.get("value"))
+                titles.append(node.text.strip())
+
+    # Display list for Selection
+    dialog = xbmcgui.Dialog()
+    ret = dialog.select("[B]{}[/B]".format(plugin.localize(SELECT_TOP)), titles)
+    if ret >= 0:
+        return video_list(plugin, url=urls[ret])
+    else:
+        return False
 
 
 @Resolver.register
