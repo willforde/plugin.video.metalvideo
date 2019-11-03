@@ -13,7 +13,7 @@ TOP_VIDEOS = 30002
 FEATURED = 30005
 PARTY_MODE = 589
 
-BASE_URL = "https://metalvideo.com"
+BASE_URL = "https://www.metalvideo.com"
 url_constructor = urljoin_partial(BASE_URL)
 
 
@@ -27,7 +27,10 @@ def root(plugin, content_type="video"):
     """
     yield Listitem.recent(video_list, url="/newvideos.html")
     yield Listitem.from_dict(top_videos, bold(plugin.localize(TOP_VIDEOS)))
-    yield Listitem.from_dict(video_list, bold(plugin.localize(FEATURED)), params={"url": "/index.html", "filter_mode": 2})
+    yield Listitem.from_dict(video_list, bold(plugin.localize(FEATURED)), params={
+        "url": "/index.html",
+        "filter_mode": 2
+    })
     yield Listitem.search(search_videos)
 
     # List Categories
@@ -98,13 +101,13 @@ def video_list(_, url, filter_mode=0):
     resp = urlquick.get(url_constructor(url))
 
     # Filter results depending on related mode
-    if filter_mode == 0:
+    if filter_mode == 0:  # Normal Videos
         root_elem = resp.parse("div", attrs={"class": "col-md-12"})
         results = root_elem.iterfind("ul/li/div")
-    elif filter_mode == 1:
+    elif filter_mode == 1:  # Related videos
         root_elem = resp.parse("ul", attrs={"class": "pm-ul-sidelist-videos list-unstyled"})
         results = root_elem.iterfind("li")
-    elif filter_mode == 2:
+    elif filter_mode == 2:  # Featured Videos
         root_elem = resp.parse("ul", attrs={"id": "pm-carousel_featured"})
         results = root_elem.iterfind("li/div")
     else:
