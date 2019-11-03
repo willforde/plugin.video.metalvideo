@@ -25,6 +25,6 @@
             <screenshot>resources/screenshots/screenshot002.jpg</screenshot>
         </assets>
         <news>[upd] Changed to work with the updated site.</news>
-        <reuselanguageinvoker>true</reuselanguageinvoker>
+        <reuselanguageinvoker>false</reuselanguageinvoker>
     </extension>
 </addon>
