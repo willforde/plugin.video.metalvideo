@@ -22,9 +22,17 @@ class Tester(unittest.TestCase):
         data = addon.video_list.test("/newvideos.html?&page=2")
         self.assertGreaterEqual(len(data), 20)
 
+    def test_featured(self):
+        data = addon.video_list.test(url="/index.html", filter_mode=2)
+        self.assertEqual(len(data), 20)
+
     def test_related(self):
         data = addon.video_list.test("/the-ancient-track-blindpoint-official-video-lyric_179ccf245.html", filter_mode=1)
         self.assertEqual(len(data), 30)
+
+    def test_bad_filter_mode(self):
+        with self.assertRaises(ValueError):
+            addon.video_list.test(url="/index.html", filter_mode=3)
 
     def test_video_list_cat(self):
         data = addon.video_list.test("/browse-alternative-videos-1-date.html")
