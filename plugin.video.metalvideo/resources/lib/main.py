@@ -10,8 +10,8 @@ import xbmcgui
 # Localized string Constants
 SELECT_TOP = 30001
 TOP_VIDEOS = 30002
-FEATURED = 30005
 PARTY_MODE = 589
+FEATURED = 30005
 
 BASE_URL = "https://www.metalvideo.com"
 url_constructor = urljoin_partial(BASE_URL)
