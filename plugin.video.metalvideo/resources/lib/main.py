@@ -11,6 +11,8 @@ import xbmcgui
 VIDEO_OF_THE_DAY = 30004
 POPULAR_VIDEOS = 30002
 SELECT_TOP = 30001
+TOP_VIDEOS = 30002
+
 
 BASE_URL = "https://metalvideo.com"
 url_constructor = urljoin_partial(BASE_URL)
